@@ -1,0 +1,71 @@
+---
+title: "cpbnplot"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cpbnplot}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+# cpbnplot: Bayesian network plot for clusterProfiler results
+
+
+## Introduction
+
+The R package to infer and plot Bayesian networks. The network are inferred from expression data based on [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler) or ReactomePA results. It makes use of libraries including [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler), [ReactomePA](https://github.com/YuLab-SMU/ReactomePA), [bnlearn](https://www.bnlearn.com/), [graphite](https://bioconductor.org/packages/release/bioc/html/graphite.html) and [depmap](https://bioconductor.org/packages/release/data/experiment/html/depmap.html). In this vignette, the description of functions and several use cases are depicted using [GSE133624](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE133624), which contains RNA-Seq data of bladder cancer. The more detail can be found on the book ([https://noriakis.github.io/cpbnplot/](https://noriakis.github.io/cpbnplot/)).
+
+## Installation
+```{r }
+devtools::install_github("noriakis/cpbnplot")
+```
+
+## Usage
+### The preprocessing and DEG identification of GSE133624
+```{r deg, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+library(DESeq2)
+library(org.Hs.eg.db)
+## Load dataset and make metadata
+counts = read.table("GSE133624_reads-count-all-sample.txt", header=1, row.names=1)
+meta = sapply(colnames(counts), function (x) substring(x,1,1))
+meta = data.frame(meta)
+colnames(meta) = c("Condition")
+
+dds <- DESeqDataSetFromMatrix(countData = counts,
+                              colData = meta,
+                              design= ~ Condition)
+## Prefiltering
+filt <- rowSums(counts(dds) < 10) > dim(meta)[1]*0.9
+dds <- dds[!filt,]
+
+## Perform DESeq2()
+dds = DESeq(dds)
+res = results(dds, pAdjustMethod = "bonferroni")
+
+## apply variance stabilizing transformation
+v = vst(dds, blind=TRUE)
+vsted = assay(v)
+
+## Define the input genes, and use clusterProfiler::bitr to convert the ID.
+sig = subset(res, padj<0.05)
+cand.entrez = clusterProfiler::bitr(rownames(sig), fromType="ENSEMBL", toType="ENTREZID", OrgDb=org.Hs.eg.db)$ENTREZID
+
+## Perform enrichment analysis
+pway = ReactomePA::enrichPathway(gene = cand.entrez)
+
+## Define including samples
+incSample = rownames(subset(meta, Condition=="T"))
+```
+### The use of cpbnplot
+Then use cpbnplot. Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
+```{r usecase, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+library(cpbnplot)
+bngeneplot(results = pway,exp = vsted, expSample = incSample, pathNum = 15)
+bnpathplot(results = pway,exp = vsted, expSample = incSample)
+bnpathplotCustom(results = pway, exp = vsted, expSample = incSample, fontFamily="sans", glowEdgeNum=3, hub=3)
+bngeneplotCustom(results = pway, exp = vsted, expSample = incSample, pathNum=15, fontFamily="sans", glowEdgeNum=NULL, hub=3)
+
+sessionInfo()
+```
+
+
+
