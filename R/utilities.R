@@ -300,7 +300,7 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
 
     # strengthBf <- bf.strength(hc(pcs), pcs)
     # averageBf <- averaged.network(strengthBf)
-    # averageBf <- cextend(averageBf, strict=F)
+    # averageBf <- cextend(averageBf, strict=FALSE)
 
     for (r in Rrange){
         strength <- boot.strength(pcs, algorithm=algo, R=r, cluster=cl, algorithm.args=NULL)
@@ -697,6 +697,7 @@ bootReasonOneDiscrete <- function (df, R, node, evidences, algo="hc", ref=NULL, 
 #' Take the list of networks and returns the F-measures
 #' 
 #' @param nets data frame to perform structure learning
+#' @importFrom utils combn
 #' @return F-measures of each combination of network
 #' @examples compareBNs(nets)
 #' @export

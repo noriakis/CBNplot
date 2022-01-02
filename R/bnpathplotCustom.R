@@ -122,7 +122,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
         if (dim(pathwayMatrix)[1]==0) {
             message("no gene in the pathway present in expression data")
         } else {
-            pathwayMatrixPca <- prcomp(t(pathwayMatrix), scale. = F)$x[,1]
+            pathwayMatrixPca <- prcomp(t(pathwayMatrix), scale. = FALSE)$x[,1]
             avExp <- apply(pathwayMatrix, 2, mean)
             corFlag <- cor(pathwayMatrixPca, avExp)
             if (corFlag < 0){pathwayMatrixPca <- pathwayMatrixPca*-1}
