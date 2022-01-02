@@ -201,6 +201,7 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
                             m=as.integer(nrow(data)*s), algorithm.args=algorithm.args)
         nList[[paste0("s",s)]] <- sb
     }
+    print("owatta")
 
     md <- nList %>% purrr::reduce(dplyr::left_join, by = c("from","to"))
 
@@ -224,14 +225,16 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
         dis <- c(dis, as.numeric(1-pnorm(ft$coef[1]-ft$coef[2])))
     }
     di$DIR <- dis
+    nn <- unique(c(di$from, di$to))
     res <- data.frame(di$from, di$to, st$MS, di$DIR)
     colnames(res) <- c("from","to","strength","direction")
 
     res = structure(res, method = "bootstrap", threshold = 0,
+                    nodes = nn,
                     class = c("bn.strength", class(res)))
 
     ## Using bnlearn version 4.7.20210803 or above for function inclusion.threshold().
-    if (packageVersion("bnlearn")=="4.7.20210803"){
+    if (packageVersion("bnlearn")=="4.7"){
         attributes(res)$threshold <- bnlearn::inclusion.threshold(res)
     }
     return(res)
