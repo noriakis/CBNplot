@@ -12,4 +12,4 @@ Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn, patchwork, org.Hs
 Suggests: knitr, arules, concaveman, ReactomePA, bnviewer
 biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network
 VignetteBuilder: knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

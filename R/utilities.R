@@ -691,3 +691,27 @@ bootReasonOneDiscrete <- function (df, R, node, evidences, algo="hc", ref=NULL, 
     )
     return(wmMean)
 }
+
+#' compareBNs
+#' 
+#' Take the list of networks and returns the F-measures
+#' 
+#' @param nets data frame to perform structure learning
+#' @return F-measures of each combination of network
+#' @examples compareBNs(nets)
+#' @export
+compareBNs <- function(listOfNets){
+  if (length(listOfNets)<2){
+    stop("please provide multiple networks from bnlearn")
+  }
+  fms <- c()
+  cmb <- combn(seq_len(length(listOfNets)), m=2)
+  for (i in seq_len(ncol(cmb))){
+    compareRes <- bnlearn::compare(listOfNets[[cmb[,i][1]]], listOfNets[[cmb[,i][2]]])
+    prec <- compareRes$tp/(compareRes$fp+compareRes$tp)
+    recall <- compareRes$tp/(compareRes$fn+compareRes$tp)
+    fm <- 2 * prec * recall / (recall + prec)
+    fms <- c(fms, fm)
+  }
+  return(fms)
+}
