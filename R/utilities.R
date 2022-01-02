@@ -201,8 +201,6 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
                             m=as.integer(nrow(data)*s), algorithm.args=algorithm.args)
         nList[[paste0("s",s)]] <- sb
     }
-    print("owatta")
-
     md <- nList %>% purrr::reduce(dplyr::left_join, by = c("from","to"))
 
     stcol <- c("from", "to", colnames(md)[grepl("strength",colnames(md))])
