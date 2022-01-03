@@ -54,7 +54,8 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
                       expRow="ENSEMBL", cl=NULL, returnNet=FALSE, otherVar=NULL, otherVarName=NULL,
                       qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15, R=20, interactive=FALSE,
                       color="p.adjust", cexCategory=1, cexLine=0.5, chooseDir=FALSE, showDir=FALSE, delZeroDegree=TRUE,
-                      labelSize=4, layout="nicely", onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL, shadowText=FALSE,
+                      labelSize=4, layout="nicely", onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
+                      shadowText=FALSE, bgColor="white", textColor="black",
                       compareRef=FALSE, strThresh=NULL, strType="normal", hub=NULL, scoreType="bic-g", databasePal="Set2",
                       dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, edgeLink=TRUE, cellLineName="5637_URINARY_TRACT", strengthPlot=FALSE, nStrength=10)
 {
@@ -410,8 +411,8 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
         if (shadowText){
             p <- p + geom_node_text(aes_(label=~stringr::str_wrap(name, width = 25)),
                 check_overlap=TRUE, repel=TRUE, size = labelSize,
-                color = "white",
-                bg.color = "black", segment.color="black",
+                color = textColor,
+                bg.color = bgColor, segment.color="black",
                 bg.r = .15)
         } else {
             p <- p + geom_node_text(aes_(label=~stringr::str_wrap(name, width = 25)),

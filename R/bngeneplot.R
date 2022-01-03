@@ -56,7 +56,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
                         otherVar=NULL, otherVarName=NULL, onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                         sp="hsapiens", compareRef=FALSE, compareRefType="intersection", pathDb="reactome",
                         dep=NULL, depMeta=NULL, sizeDep=FALSE, showDepHist=TRUE, cellLineName="5637_URINARY_TRACT",
-                        showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=FALSE, strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL) {
+                        showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=FALSE, bgColor="white", textColor="black",
+                        strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL) {
     
     if (is.null(expSample)) {expSample=colnames(exp)}
     if (compareRef & length(pathNum) > 1){stop("compareRef can be used with one pathNum or pathName.")}
@@ -339,8 +340,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
             if (shadowText){
                 p <- p + geom_node_text(aes_(label=~stringr::str_wrap(name, width = 25)),
                     check_overlap=TRUE, repel=TRUE, size = labelSize,
-                    color = "white",
-                    bg.color = "black", segment.color="black",
+                    color = textColor,
+                    bg.color = bgColor, segment.color="black",
                     bg.r = .15)
             } else {
                 p <- p + geom_node_text(aes_(label=~stringr::str_wrap(name, width = 25)),
