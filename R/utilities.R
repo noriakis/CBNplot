@@ -430,7 +430,7 @@ discDF <- function(df, tr=NULL, remainCont=NULL) {
 #' Recursively perform choose.direction() from bnlearn on undirected arcs.
 #'
 #' @noRd
-chooseEdgeDir <- function(av, pcs, scoreType, debug=TRUE) {
+chooseEdgeDir <- function(av, pcs, scoreType, debug=FALSE) {
     if (dim(undirected.arcs(av))[1]!=0){
         message("found undirected arc(s)")
         undir <- undirected.arcs(av)
