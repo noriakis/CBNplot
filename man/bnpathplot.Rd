@@ -33,6 +33,8 @@ bnpathplot(
   tr = NULL,
   remainCont = NULL,
   shadowText = FALSE,
+  bgColor = "white",
+  textColor = "black",
   compareRef = FALSE,
   strThresh = NULL,
   strType = "normal",

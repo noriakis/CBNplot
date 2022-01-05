@@ -8,6 +8,7 @@
 #' @param candidate name of node
 #' @param evidences the evidences
 #'
+#' @importFrom dplyr mutate
 #' @return list of dataframe containing raw values
 #' @examples queryCpDistLs(fitted, candidate="Mitotic Spindle Checkpoint", evidences=c("TP53<0.5","TP53>0.5","TP53>0.8"), n=5000)
 #' @export
@@ -188,6 +189,7 @@ depKStest <- function(results, type, cellLineName=NULL, lineageName=NULL, adjMet
 #'
 #' multiscale bootstrap-based inference of Bayesian network
 #'
+#' @importFrom utils packageVersion
 #' @return object of class bn.strength
 #'
 #'

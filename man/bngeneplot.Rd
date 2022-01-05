@@ -44,6 +44,8 @@ bngeneplot(
   showLineage = FALSE,
   orgDb = org.Hs.eg.db,
   shadowText = FALSE,
+  bgColor = "white",
+  textColor = "black",
   strengthPlot = FALSE,
   nStrength = 10,
   strThresh = NULL,
