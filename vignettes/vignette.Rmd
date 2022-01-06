@@ -1,22 +1,22 @@
 ---
-title: "cpbnplot"
+title: "CBNplot"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{cpbnplot}
+  %\VignetteIndexEntry{CBNplot}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-# cpbnplot: Bayesian network plot for clusterProfiler results
+# CBNplot: Bayesian network plot for clusterProfiler results
 
 
 ## Introduction
 
-The R package to infer and plot Bayesian networks. The network are inferred from expression data based on [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler) or ReactomePA results. It makes use of libraries including [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler), [ReactomePA](https://github.com/YuLab-SMU/ReactomePA), [bnlearn](https://www.bnlearn.com/), [graphite](https://bioconductor.org/packages/release/bioc/html/graphite.html) and [depmap](https://bioconductor.org/packages/release/data/experiment/html/depmap.html). In this vignette, the description of functions and several use cases are depicted using [GSE133624](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE133624), which contains RNA-Seq data of bladder cancer. The more detail can be found on the book ([https://noriakis.github.io/cpbnplot/](https://noriakis.github.io/cpbnplot/)).
+The R package to infer and plot Bayesian networks. The network are inferred from expression data based on [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler) or ReactomePA results. It makes use of libraries including [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler), [ReactomePA](https://github.com/YuLab-SMU/ReactomePA), [bnlearn](https://www.bnlearn.com/), [graphite](https://bioconductor.org/packages/release/bioc/html/graphite.html) and [depmap](https://bioconductor.org/packages/release/data/experiment/html/depmap.html). In this vignette, the description of functions and several use cases are depicted using [GSE133624](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE133624), which contains RNA-Seq data of bladder cancer. The more detail can be found on the book ([https://noriakis.github.io/CBNplot/](https://noriakis.github.io/CBNplot/)).
 
 ## Installation
 ```{r }
-devtools::install_github("noriakis/cpbnplot")
+devtools::install_github("noriakis/CBNplot")
 ```
 
 ## Usage
@@ -51,14 +51,15 @@ cand.entrez = clusterProfiler::bitr(rownames(sig), fromType="ENSEMBL", toType="E
 
 ## Perform enrichment analysis
 pway = ReactomePA::enrichPathway(gene = cand.entrez)
+pway = clusterProfiler::setReadable(pway, org.Hs.eg.db)
 
 ## Define including samples
 incSample = rownames(subset(meta, Condition=="T"))
 ```
-### The use of cpbnplot
-Then use cpbnplot. Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
+### The use of CBNplot
+Then use CBNplot Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
 ```{r usecase, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
-library(cpbnplot)
+library(CBNplot)
 bngeneplot(results = pway,exp = vsted, expSample = incSample, pathNum = 15)
 bnpathplot(results = pway,exp = vsted, expSample = incSample)
 bnpathplotCustom(results = pway, exp = vsted, expSample = incSample, fontFamily="sans", glowEdgeNum=3, hub=3)
