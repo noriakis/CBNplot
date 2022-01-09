@@ -42,7 +42,7 @@ dds = DESeq(dds)
 res = results(dds, pAdjustMethod = "bonferroni")
 
 ## apply variance stabilizing transformation
-v = vst(dds, blind=TRUE)
+v = vst(dds, blind=FALSE)
 vsted = assay(v)
 
 ## Define the input genes, and use clusterProfiler::bitr to convert the ID.

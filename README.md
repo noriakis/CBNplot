@@ -11,7 +11,6 @@ install_github("noriakis/CBNplot")
 
 ### Usage
 - Documentation: [https://noriakis.github.io/software/CBNplot/](https://noriakis.github.io/software/CBNplot/)
-- ``bladder_cancer.ipynb``: the example using bladder cancer dataset ([GSE133624](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE133624)).
 
 ### Plot examples
 
