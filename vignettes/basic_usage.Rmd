@@ -17,6 +17,7 @@ The R package to infer and plot Bayesian networks. The network are inferred from
 ## Installation
 ```{r }
 devtools::install_github("noriakis/CBNplot")
+library(CBNplot)
 ```
 
 ## Usage
@@ -24,8 +25,10 @@ devtools::install_github("noriakis/CBNplot")
 ```{r deg, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
 library(DESeq2)
 library(org.Hs.eg.db)
+library(GEOquery)
 ## Load dataset and make metadata
-counts = read.table("GSE133624_reads-count-all-sample.txt", header=1, row.names=1)
+filePaths <- getGEOSuppFiles("GSE133624")
+counts = read.table(rownames(filePaths)[1], header=1, row.names=1)
 meta = sapply(colnames(counts), function (x) substring(x,1,1))
 meta = data.frame(meta)
 colnames(meta) = c("Condition")
@@ -57,11 +60,12 @@ pway = clusterProfiler::setReadable(pway, org.Hs.eg.db)
 incSample = rownames(subset(meta, Condition=="T"))
 ```
 ### The use of CBNplot
-Then use CBNplot Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
+
+Then use CBNplot. Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
+
 ```{r usecase, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
-library(CBNplot)
 bngeneplot(results = pway,exp = vsted, expSample = incSample, pathNum = 15)
-bnpathplot(results = pway,exp = vsted, expSample = incSample)
+bnpathplot(results = pway,exp = vsted, expSample = incSample, shadowText = TRUE)
 bnpathplotCustom(results = pway, exp = vsted, expSample = incSample, fontFamily="sans", glowEdgeNum=3, hub=3)
 bngeneplotCustom(results = pway, exp = vsted, expSample = incSample, pathNum=15, fontFamily="sans", glowEdgeNum=NULL, hub=3)
 
