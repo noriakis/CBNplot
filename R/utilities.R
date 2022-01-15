@@ -133,57 +133,6 @@ queryCpDistLw <- function (fitted, candidate, evidence, level, point=FALSE, poin
     return(returnList)
 }
 
-#' depKStest
-#'
-#' Perform KS-test recursively
-#' @param type "cell_line" or "lineage"
-#' @return pvalues and adjusted pvalues
-#' @examples depKStest(pway, type="cell_line", cellLineName="253J_URINARY_TRACT", dep=depmap::depmap_crispr(), depMeta=depmap::depmap_metadata())
-#' @export
-#'
-depKStest <- function(results, type, cellLineName=NULL, lineageName=NULL, adjMethod="bonferroni", dep=NULL, depMeta=NULL){
-
-    # if (results@keytype == "ENTREZID" | results@keytype == "kegg"){
-    #     q <- "entrez_id"
-    # } else if (results@keytype == "SYMBOL"){
-    #     q <- "gene_name"
-    # } else {
-    #     stop("provide entrezid, symbol or kegg")
-    # }
-    q <- "gene_name"
-
-    if(is.null(dep)){stop("please provide depmap data")}
-    if (type == "lineage"){
-        if (is.null(depMeta)){stop("please provide metadata")}
-        if (is.null(lineageName)){stop("please provide lineage name")}
-        specificDep <- depMeta %>%
-            dplyr::select(depmap_id, lineage) %>%
-            dplyr::full_join(dep, by = "depmap_id") %>%
-            filter(lineage == lineageName)
-        y <- specificDep$dependency
-    } else if (type == "cell_line"){
-        if (is.null(cellLineName)){stop("please provide cell line name")}
-        specificDep <- dep %>% filter(cell_line == cellLineName)
-        y <- specificDep$dependency
-    }
-
-    ksp <- c()
-    for (i in seq_len(length(rownames(results@result)))){
-        genesInPathway <- strsplit(results@result[i, "geneID"], "/")[[1]]
-        x <- (specificDep %>% filter((!!sym(q)) %in% genesInPathway) %>% select(dependency))$dependency
-        if (length(x) == 0){
-            ksp <- c(ksp, NA)
-        } else {
-            ksp <- c(ksp, ks.test(x, y)$p.value)
-        }
-    }
-    pway@result$depP <- ksp
-    pway@result$depAdjP <- p.adjust(ksp, adjMethod)
-    return(pway)
-}
-
-
-
 
 #' inferMS
 #'
