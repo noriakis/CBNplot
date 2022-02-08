@@ -9,7 +9,7 @@ Encoding: UTF-8
 Depends:
     R (>= 4.1.0)
 Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn, patchwork, org.Hs.eg.db, clusterProfiler, utils, enrichplot, reshape2, ggforce, dplyr, tidyr, stringr, depmap, ExperimentHub, Rmpfr, graphlayouts, BiocFileCache, ggdist
-Suggests: knitr, arules, concaveman, ReactomePA, bnviewer
+Suggests: knitr, arules, concaveman, ReactomePA, bnviewer, DESeq2, GEOquery
 biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2

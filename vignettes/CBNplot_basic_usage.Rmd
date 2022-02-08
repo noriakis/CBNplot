@@ -15,8 +15,8 @@ vignette: >
 The R package to infer and plot Bayesian networks. The network are inferred from expression data based on [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler) or ReactomePA results. It makes use of libraries including [clusterProfiler](https://github.com/YuLab-SMU/clusterProfiler), [ReactomePA](https://github.com/YuLab-SMU/ReactomePA), [bnlearn](https://www.bnlearn.com/), [graphite](https://bioconductor.org/packages/release/bioc/html/graphite.html) and [depmap](https://bioconductor.org/packages/release/data/experiment/html/depmap.html). In this vignette, the description of functions and several use cases are depicted using [GSE133624](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE133624), which contains RNA-Seq data of bladder cancer. The more detail can be found on the book ([https://noriakis.github.io/CBNplot/](https://noriakis.github.io/CBNplot/)).
 
 ## Installation
-```{r }
-devtools::install_github("noriakis/CBNplot")
+```{r, eval=FALSE}
+BiocManager::install("CBNplot")
 library(CBNplot)
 ```
 
