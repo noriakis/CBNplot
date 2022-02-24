@@ -1,2 +1,5 @@
-Changes in version 0.99.0 (2021-7-29)
+Changes in version 0.99.0 (2021-07-29)
 + Prepared for submission to Bioconductor
+
+Changes in version 0.99.1 (2022-02-24)
++ Fixed errors and warnings raised in pre-checking
