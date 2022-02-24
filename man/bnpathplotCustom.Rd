@@ -36,7 +36,6 @@ bnpathplotCustom(
   otherVarName = NULL,
   onlyDf = FALSE,
   algorithm.args = NULL,
-  showLineage = FALSE,
   strengthPlot = FALSE,
   nStrength = 10,
   strThresh = NULL,
@@ -87,6 +86,12 @@ bnpathplotCustom(
 
 \item{compareRef}{whether compare to the reference network between pathway}
 
+\item{disc}{discretize the expressoin data}
+
+\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+
+\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+
 \item{qvalueCutOff}{the cutoff value for qvalue}
 
 \item{adjpCutOff}{the cutoff value for adjusted pvalues}
@@ -104,6 +109,14 @@ bnpathplotCustom(
 \item{cellLineName}{the cell line name to be included}
 
 \item{fontFamily}{font family name to be used for plotting}
+
+\item{otherVar}{other variables to be included in the inference}
+
+\item{otherVarName}{the names of other variables}
+
+\item{onlyDf}{return only data.frame used for inference}
+
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
 
 \item{strengthPlot}{append the barplot depicting edges with high strength}
 
@@ -133,6 +146,8 @@ bnpathplotCustom(
 
 \item{barLegendKeyCol}{legend key color in barplot}
 
+\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+
 \item{barAxisCol}{axis color in barplot}
 
 \item{barPanelGridCol}{panel grid color in barplot}
@@ -144,5 +159,6 @@ ggplot2 object
 Plot pathway relationship using customized theme
 }
 \examples{
-bnpathplotCustom(results = pway, fontFamily="sans", glowEdgeNum=3, hub=3, exp = vsted, expSample=rownames(subset(meta, Condition=="T")))
+data("exampleEaRes");data("exampleGeneExp")
+res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp, fontFamily="sans", glowEdgeNum=3, hub=3)
 }

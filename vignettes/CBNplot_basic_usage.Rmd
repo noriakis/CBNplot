@@ -17,12 +17,12 @@ The R package to infer and plot Bayesian networks. The network are inferred from
 ## Installation
 ```{r, eval=FALSE}
 BiocManager::install("CBNplot")
-library(CBNplot)
 ```
 
 ## Usage
 ### The preprocessing and DEG identification of GSE133624
 ```{r deg, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+library(CBNplot)
 library(DESeq2)
 library(org.Hs.eg.db)
 library(GEOquery)

@@ -18,5 +18,6 @@ subset of enrichment results
 obtain the analysis results including the queried gene symbol
 }
 \examples{
-obtainPath(results = pway, geneSymbol="E2F1")
+data("exampleEaRes")
+obtainPath(res = exampleEaRes, geneSymbol="ERCC7")
 }

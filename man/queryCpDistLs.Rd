@@ -12,6 +12,10 @@ queryCpDistLs(fitted, candidate, evidences, discPalette = "Set2", ...)
 \item{candidate}{name of node}
 
 \item{evidences}{the evidences}
+
+\item{discPalette}{palette to be used for plotting if the event is discrete}
+
+\item{...}{other parameters passed to bnlearn cpdist}
 }
 \value{
 list of dataframe containing raw values
@@ -20,5 +24,5 @@ list of dataframe containing raw values
 produce a plot of bnlearn::cpdist by performing bnlearn::cpdist on specified node, evidence and level.
 }
 \examples{
-queryCpDistLs(fitted, candidate="Mitotic Spindle Checkpoint", evidences=c("TP53<0.5","TP53>0.5","TP53>0.8"), n=5000)
+\dontrun{queryCpDistLs(fitted, candidate="Mitotic Spindle Checkpoint", evidences=c("TP53<0.5","TP53>0.5","TP53>0.8"), n=5000)}
 }

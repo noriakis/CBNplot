@@ -1,5 +1,3 @@
-
-
 #' queryCpDistLs
 #'
 #' produce a plot of bnlearn::cpdist by performing bnlearn::cpdist on specified node, evidence and level.
@@ -7,10 +5,12 @@
 #' @param fitted bn.fit object
 #' @param candidate name of node
 #' @param evidences the evidences
+#' @param discPalette palette to be used for plotting if the event is discrete 
+#' @param ... other parameters passed to bnlearn cpdist
 #'
 #' @importFrom dplyr mutate
 #' @return list of dataframe containing raw values
-#' @examples queryCpDistLs(fitted, candidate="Mitotic Spindle Checkpoint", evidences=c("TP53<0.5","TP53>0.5","TP53>0.8"), n=5000)
+#' @examples \dontrun{queryCpDistLs(fitted, candidate="Mitotic Spindle Checkpoint", evidences=c("TP53<0.5","TP53>0.5","TP53>0.8"), n=5000)}
 #' @export
 #'
 queryCpDistLs <- function (fitted, candidate, evidences, discPalette="Set2",...) {
@@ -86,12 +86,14 @@ queryCpDistLs <- function (fitted, candidate, evidences, discPalette="Set2",...)
 #' @param level level to be listed
 #' @param alpha whether to reflect the weights by alpha (TRUE) or color (FALSE)
 #' @param point geom_point the weighted mean
+#' @param pointSize point size for geom_point
+#' @param ... other parameters passed to bnlearn cpdist
 #' @importFrom dplyr summarise
 #' @importFrom ggdist geom_dots
 #' @importFrom ggdist scale_fill_ramp_continuous
 #' @importFrom bnlearn cpdist
 #' @return list of dataframe containing raw values
-#' @examples queryCpDistLw(fitted, candidate="COL25A1", evidence = "Treatment", level=rownames(fitted$Treatment$prob))
+#' @examples \dontrun{queryCpDistLw(fitted, candidate="COL25A1", evidence = "Treatment", level=rownames(fitted$Treatment$prob))}
 #' @export
 #'
 queryCpDistLw <- function (fitted, candidate, evidence, level, point=FALSE, pointSize=5, alpha=TRUE, ...) {
@@ -138,7 +140,16 @@ queryCpDistLw <- function (fitted, candidate, evidence, level, point=FALSE, poin
 #'
 #' multiscale bootstrap-based inference of Bayesian network
 #'
+#' @param data data.frame to perform inference
+#' @param algo structure learning method used in boot.strength()
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
+#' @param R the number of bootstrap
+#' @param cl cluster object from parallel::makeCluster()
+#' @param r vector for size of each bootstrap replicate
 #' @importFrom utils packageVersion
+#' @importFrom bnlearn inclusion.threshold
+#' @importFrom pvclust msfit
+#' @importFrom purrr reduce
 #' @return object of class bn.strength
 #'
 #'
@@ -152,7 +163,7 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
                             m=as.integer(nrow(data)*s), algorithm.args=algorithm.args)
         nList[[paste0("s",s)]] <- sb
     }
-    md <- nList %>% purrr::reduce(dplyr::left_join, by = c("from","to"))
+    md <- nList %>% reduce(dplyr::left_join, by = c("from","to"))
 
     stcol <- c("from", "to", colnames(md)[grepl("strength",colnames(md))])
     dicol <- c("from", "to", colnames(md)[grepl("direc",colnames(md))])
@@ -161,7 +172,7 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
     ms <- c()
     for (i in seq_len(nrow(st))){
         tmpbp <- as.numeric(st[i,][3:length(st[i,])])
-        ft <- pvclust::msfit(tmpbp, r, R)
+        ft <- msfit(tmpbp, r, R)
         ms <- c(ms, as.numeric(1-pnorm(ft$coef[1]-ft$coef[2])))
     }
     st$MS <- ms
@@ -170,7 +181,7 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
     dis <- c()
     for (i in seq_len(nrow(di))){
         tmpbp <- as.numeric(di[i,][3:length(di[i,])])
-        ft <- pvclust::msfit(tmpbp, r, R)
+        ft <- msfit(tmpbp, r, R)
         dis <- c(dis, as.numeric(1-pnorm(ft$coef[1]-ft$coef[2])))
     }
     di$DIR <- dis
@@ -184,7 +195,7 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
 
     ## Using bnlearn version 4.7.20210803 or above for function inclusion.threshold().
     if (packageVersion("bnlearn")=="4.7"){
-        attributes(res)$threshold <- bnlearn::inclusion.threshold(res)
+        attributes(res)$threshold <- inclusion.threshold(res)
     }
     return(res)
 }
@@ -198,15 +209,18 @@ inferMS <- function(data, algo, algorithm.args, R, cl=NULL, r=seq(0.5, 1.5, 0.1)
 #' @param expRow the type of the identifier of rows of expression matrix
 #' @param expSample candidate rows to be included in the inference, default to all
 #' @param algo structure learning method used in boot.strength(), default to "hc"
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
 #' @param cl cluster object from parallel::makeCluster()
-#' @param qvalueCutoff the cutoff value for qvalue
+#' @param qvalueCutOff the cutoff value for qvalue
 #' @param adjpCutOff the cutoff value for adjusted pvalues
 #' @param nCategory the number of pathways to be included
 #' @param Rrange the sequence of R values to be tested
 #' @param scoreType return the specified scores
 #'
 #' @return list of graphs and scores
-#' @examples bnpathtest(results = pway, algo="hc", exp = vsted, Rrange=seq(10, 200, 5), expSample = rownames(subset(meta, Condition=="T")), expRow = "ENSEMBL", scoreType="bge")
+#' @examples
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bnpathtest(results = exampleEaRes, exp = exampleGeneExp, algo="hc", Rrange=seq(10, 30, 10), expRow = "ENSEMBL", scoreType="bge")
 #' @export
 #'
 bnpathtest <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=NULL, expRow="ENSEMBL", cl=NULL,
@@ -283,6 +297,7 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
 #' @param expRow the type of the identifier of rows of expression matrix
 #' @param expSample candidate rows to be included in the inference, default to all
 #' @param algo structure learning method used in boot.strength(), default to "hc"
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
 #' @param cl cluster object from parallel::makeCluster()
 #' @param Rrange the sequence of R values to be tested
 #' @param scoreType return the specified scores
@@ -290,7 +305,9 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
 #' @param pathNum the pathway number (the number of row of the original result, ordered by p-value)
 #'
 #' @return list of graphs and scores
-#' @examples bngenetest(results = pway, algo="hc", exp = vsted, Rrange=seq(10, 200, 5), pathNum=15, expSample = rownames(subset(meta, Condition=="T")), expRow = "ENSEMBL", scoreType="bge")
+#' @examples
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bngenetest(results = exampleEaRes, exp = exampleGeneExp, algo="hc", Rrange=seq(10, 30, 10), pathNum=1, scoreType="bge")
 #' @export
 #'
 bngenetest <- function (results, exp, expSample=NULL, algo="hc", Rrange=seq(2,40,2), cl=NULL, algorithm.args=NULL,
@@ -301,7 +318,7 @@ bngenetest <- function (results, exp, expSample=NULL, algo="hc", Rrange=seq(2,40
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-
+    if (is.null(expSample)) {expSample=colnames(exp)}
     res <- results@result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
@@ -432,15 +449,18 @@ returnReactomeIntersection <- function(res, g) {
 #' @param res enrichment analysis result
 #' @param geneSymbol the candidate gene
 #'
+#' @importFrom purrr map
 #' @return subset of enrichment results
-#' @examples obtainPath(results = pway, geneSymbol="E2F1")
+#' @examples
+#' data("exampleEaRes")
+#' obtainPath(res = exampleEaRes, geneSymbol="ERCC7")
 #' @export
 
 obtainPath <- function(res, geneSymbol) {
     # if (res@keytype=="kegg"){tot <- "ENTREZID"} else {tot <- res@keytype}
     # candidateGene <- clusterProfiler::bitr(geneSymbol, fromType = "SYMBOL", toType = tot, org.Hs.eg.db)[tot]
-    res@result <- res@result[unlist(purrr::map(purrr::map(res@result$geneID,
-                                                                  function (x) unlist(strsplit(x, "/"))),
+    res@result <- res@result[unlist(map(map(res@result$geneID,
+                                                       function (x) unlist(strsplit(x, "/"))),
                                                        function(x) geneSymbol %in% x)),]
     return(res)
 }
@@ -449,10 +469,14 @@ obtainPath <- function(res, geneSymbol) {
 #' 
 #' Take the list of networks and returns the F-measures
 #' 
-#' @param nets data frame to perform structure learning
+#' @param listOfNets list of networks
 #' @importFrom utils combn
 #' @return F-measures of each combination of network
-#' @examples compareBNs(nets)
+#' @examples
+#' data("exampleEaRes");data("exampleGeneExp")
+#' net1 <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
+#' net2 <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
+#' res <- compareBNs(list(net1$av, net2$av))
 #' @export
 compareBNs <- function(listOfNets){
   if (length(listOfNets)<2){

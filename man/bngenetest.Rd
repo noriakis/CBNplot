@@ -31,6 +31,8 @@ bngenetest(
 
 \item{cl}{cluster object from parallel::makeCluster()}
 
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+
 \item{pathNum}{the pathway number (the number of row of the original result, ordered by p-value)}
 
 \item{convertSymbol}{whether the label of resulting network is converted to symbol, default to TRUE}
@@ -46,5 +48,6 @@ list of graphs and scores
 Testing various R for bayesian network between genes
 }
 \examples{
-bngenetest(results = pway, algo="hc", exp = vsted, Rrange=seq(10, 200, 5), pathNum=15, expSample = rownames(subset(meta, Condition=="T")), expRow = "ENSEMBL", scoreType="bge")
+data("exampleEaRes");data("exampleGeneExp")
+res <- bngenetest(results = exampleEaRes, exp = exampleGeneExp, algo="hc", Rrange=seq(10, 30, 10), pathNum=1, scoreType="bge")
 }

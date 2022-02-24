@@ -7,10 +7,15 @@
 #' @param expRow the type of the identifier of rows of expression matrix
 #' @param expSample candidate rows to be included in the inference, default to all
 #' @param algo structure learning method used in boot.strength(), default to "hc"
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
 #' @param R the number of bootstrap
 #' @param interactive whether to use bnviewer (default to FALSE)
 #' @param color color of node, default to adjusted p-value
 #' @param cexCategory scaling factor of size of nodes
+#' @param delZeroDegree delete zero degree nodes
+#' @param disc discretize the expressoin data
+#' @param tr Specify data.frame if one needs to discretize as the same parameters as the other dataset
+#' @param remainCont Specify characters when perform discretization, if some columns are to be remain continuous
 #' @param cexLine scaling factor of width of edges
 #' @param cl cluster object from parallel::makeCluster()
 #' @param showDir show the confidence of direction of edges
@@ -34,7 +39,12 @@
 #' @param otherVar other variables to be included in the inference
 #' @param otherVarName the names of other variables
 #' @param onlyDf return only data.frame used for inference
+#' @param edgeLink whether to set edge to geom_edge_link(), FALSE to use geom_edge_diagonal()
 #' @param databasePal palette to be used in scale_color_brewer, when the multiple results are to be shown
+#' @param orgDb perform clusterProfiler::setReadable based on this organism database
+#' @param shadowText whether to use shadow text for the better readability (default: TRUE)
+#' @param bgColor color for text background when shadowText is TRUE
+#' @param textColor color for text when shadowText is TRUE
 #'
 #' @return ggplot2 object
 #'
@@ -46,7 +56,8 @@
 #' @importFrom reshape2 melt
 #' @importFrom stringr str_starts
 #' @examples
-#' bnpathplot(results = pway, exp = vsted, expSample = rownames(subset(meta, Condition=="T")), R = 10, expRow = "ENSEMBL")
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bnpathplot(results = exampleEaRes, exp = exampleGeneExp, R = 10, expRow = "ENSEMBL")
 #'
 #' @export
 #'
@@ -55,7 +66,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
                       qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15, R=20, interactive=FALSE,
                       color="p.adjust", cexCategory=1, cexLine=0.5, chooseDir=FALSE, showDir=FALSE, delZeroDegree=TRUE,
                       labelSize=4, layout="nicely", onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
-                      shadowText=FALSE, bgColor="white", textColor="black",
+                      shadowText=TRUE, bgColor="white", textColor="black",
                       compareRef=FALSE, strThresh=NULL, strType="normal", hub=NULL, scoreType="bic-g", databasePal="Set2",
                       dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, edgeLink=TRUE, cellLineName="5637_URINARY_TRACT", strengthPlot=FALSE, nStrength=10)
 {
@@ -430,7 +441,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
         }
 
         if (strengthPlot){
-            p <- p / stp + plot_layout(nrow=2, ncol=1, height=c(0.8, 0.2))
+            p <- p / stp + plot_layout(nrow=2, ncol=1, heights=c(0.8, 0.2))
         }
 
         if (returnNet){

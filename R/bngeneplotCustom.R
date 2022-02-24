@@ -7,7 +7,11 @@
 #' @param expRow the type of the identifier of rows of expression matrix
 #' @param expSample candidate rows to be included in the inference, default to all
 #' @param algo structure learning method used in boot.strength(), default to "hc"
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
+#' @param otherVar other variables to be included in the inference
+#' @param otherVarName the names of other variables
 #' @param R the number of bootstrap
+#' @param onlyDf return only data.frame used for inference
 #' @param pathNum the pathway number (the number of row of the original result, ordered by p-value)
 #' @param convertSymbol whether the label of resulting network is converted to symbol, default to TRUE
 #' @param cexCategory scaling factor of size of nodes
@@ -17,14 +21,11 @@
 #' @param labelSize the size of label of the nodes
 #' @param layout ggraph layout, default to "nicely"
 #' @param strType "normal" or "ms" for multiscale implementation
-#' @param pathDb query to graphite::pathways(), default to "reactome"
 #' @param dep the tibble storing dependency score from library depmap
 #' @param sizeDep whether to reflect DepMap score to the node size
 #' @param cellLineName the cell line name to be included
 #' @param strengthPlot append the barplot depicting edges with high strength
 #' @param nStrength specify how many edges are included in the strength plot
-#' @param showLineage show the dependency score across the lineage
-#' @param depMeta depmap::depmap_metadata(), needed for showLineage
 #' @param strThresh the threshold for strength
 #' @param hub visualize the genes with top-n hub scores
 #' @param fontFamily font family name to be used for plotting
@@ -43,8 +44,16 @@
 #' @param returnNet whether to return the network
 #' @param titleSize the size of title
 #' @param scoreType score type to use on inference
-#'
-#' @examples bngeneplotCustom(results = pway, chooseDir=TRUE, pathNum=15, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans", exp = vsted, expSample=rownames(subset(meta, Condition=="T")))
+#' @param orgDb perform clusterProfiler::setReadable based on this organism database
+#' @param interactive whether to use bnviewer (default to FALSE)
+#' @param disc discretize the expressoin data
+#' @param tr Specify data.frame if one needs to discretize as the same parameters as the other dataset
+#' @param remainCont Specify characters when perform discretization, if some columns are to be remain continuous
+
+#' 
+#' @examples
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, chooseDir=TRUE, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
 #' @return ggplot2 object
 #'
 #' @export
@@ -56,7 +65,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
                              labelSize=4, layout="nicely", strType="normal", returnNet=FALSE,
                              otherVar=NULL, otherVarName=NULL, onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                              dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, cellLineName="5637_URINARY_TRACT", fontFamily="sans",
-                             showLineage=FALSE, strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
+                             strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
                              nodePal=c("blue","red"), edgePal=c("blue","red"), textCol="black", titleCol="black", backCol="white",
                              barTextCol="black", barPal=c("red","blue"), barBackCol="white", scoreType="bic-g",
                              barLegendKeyCol="white", barAxisCol="black", barPanelGridCol="black", titleSize=24) {
@@ -78,10 +87,10 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     tmpCol[tmpCol=="setSize"] <- "Count"
     colnames(results@result) <- tmpCol
 
-    if (showLineage) {
-        if (is.null(dep)){dep = depmap::depmap_crispr()}
-        if (is.null(depMeta)){depMeta = depmap::depmap_metadata()}
-    }
+    # if (showLineage) {
+    #     if (is.null(dep)){dep = depmap::depmap_crispr()}
+    #     if (is.null(depMeta)){depMeta = depmap::depmap_metadata()}
+    # }
 
     if (sizeDep) {
         if (is.null(cellLineName)){stop("Please specify cell line name.")}
@@ -335,7 +344,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
         stop("The plotting across multiple pathways is currently not supported in custom.")
     }
     if (strengthPlot){
-        p <- p / stp + plot_layout(nrow=2, ncol=1, height=c(0.8, 0.2))
+        p <- p / stp + plot_layout(nrow=2, ncol=1, heights=c(0.8, 0.2))
     }
     if (returnNet){
         returnList <- list()

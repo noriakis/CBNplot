@@ -28,9 +28,13 @@ bnpathtest(
 
 \item{algo}{structure learning method used in boot.strength(), default to "hc"}
 
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
 \item{cl}{cluster object from parallel::makeCluster()}
+
+\item{qvalueCutOff}{the cutoff value for qvalue}
 
 \item{adjpCutOff}{the cutoff value for adjusted pvalues}
 
@@ -39,8 +43,6 @@ bnpathtest(
 \item{Rrange}{the sequence of R values to be tested}
 
 \item{scoreType}{return the specified scores}
-
-\item{qvalueCutoff}{the cutoff value for qvalue}
 }
 \value{
 list of graphs and scores
@@ -49,5 +51,6 @@ list of graphs and scores
 Testing various R for bayesian network between pathways
 }
 \examples{
-bnpathtest(results = pway, algo="hc", exp = vsted, Rrange=seq(10, 200, 5), expSample = rownames(subset(meta, Condition=="T")), expRow = "ENSEMBL", scoreType="bge")
+data("exampleEaRes");data("exampleGeneExp")
+res <- bnpathtest(results = exampleEaRes, exp = exampleGeneExp, algo="hc", Rrange=seq(10, 30, 10), expRow = "ENSEMBL", scoreType="bge")
 }

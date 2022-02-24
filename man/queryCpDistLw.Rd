@@ -26,7 +26,11 @@ queryCpDistLw(
 
 \item{point}{geom_point the weighted mean}
 
+\item{pointSize}{point size for geom_point}
+
 \item{alpha}{whether to reflect the weights by alpha (TRUE) or color (FALSE)}
+
+\item{...}{other parameters passed to bnlearn cpdist}
 }
 \value{
 list of dataframe containing raw values
@@ -35,5 +39,5 @@ list of dataframe containing raw values
 produce a plot of bnlearn::cpdist by performing bnlearn::cpdist on specified node, evidence and level.
 }
 \examples{
-queryCpDistLw(fitted, candidate="COL25A1", evidence = "Treatment", level=rownames(fitted$Treatment$prob))
+\dontrun{queryCpDistLw(fitted, candidate="COL25A1", evidence = "Treatment", level=rownames(fitted$Treatment$prob))}
 }

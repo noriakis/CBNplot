@@ -6,6 +6,19 @@
 \usage{
 inferMS(data, algo, algorithm.args, R, cl = NULL, r = seq(0.5, 1.5, 0.1))
 }
+\arguments{
+\item{data}{data.frame to perform inference}
+
+\item{algo}{structure learning method used in boot.strength()}
+
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+
+\item{R}{the number of bootstrap}
+
+\item{cl}{cluster object from parallel::makeCluster()}
+
+\item{r}{vector for size of each bootstrap replicate}
+}
 \value{
 object of class bn.strength
 }

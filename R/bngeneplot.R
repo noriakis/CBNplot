@@ -7,13 +7,19 @@
 #' @param expRow the type of the identifier of rows of expression matrix
 #' @param expSample candidate samples to be included in the inference, default to all
 #' @param algo structure learning method used in boot.strength(), default to "hc"
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
 #' @param R the number of bootstrap
 #' @param pathNum the pathway number (the number of row of the original result, ordered by p-value)
 #' @param convertSymbol whether the label of resulting network is converted to symbol, default to TRUE
 #' @param interactive whether to use bnviewer (default to FALSE)
 #' @param cexCategory scaling factor of size of nodes
+#' @param delZeroDegree delete zero degree nodes
+#' @param disc discretize the expressoin data
+#' @param tr Specify data.frame if one needs to discretize as the same parameters as the other dataset
+#' @param remainCont Specify characters when perform discretization, if some columns are to be remain continuous
 #' @param cl cluster object from parallel::makeCluster()
 #' @param showDir show the confidence of direction of edges
+#' @param showDepHist whether to show depmap histogram
 #' @param chooseDir if undirected edges are present, choose direction of edges (default: FALSE)
 #' @param scoreType score type to use on choosing direction
 #' @param labelSize the size of label of the nodes
@@ -37,11 +43,16 @@
 #' @param otherVar other variables to be included in the inference
 #' @param otherVarName the names of other variables
 #' @param onlyDf return only data.frame used for inference
+#' @param orgDb perform clusterProfiler::setReadable based on this organism database
+#' @param shadowText whether to use shadow text for the better readability (default: TRUE)
+#' @param bgColor color for text background when shadowText is TRUE
+#' @param textColor color for text when shadowText is TRUE
 #'
 #' @return ggplot2 object
 #'
 #' @examples
-#' bngeneplot(results = pway, exp = vsted, expSample = rownames(subset(meta, Condition=="T")), pathNum = 17, R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
 #'
 #' @importFrom dplyr group_by summarize arrange n
 #' @importFrom graphite pathways convertIdentifiers pathwayGraph
@@ -56,7 +67,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
                         otherVar=NULL, otherVarName=NULL, onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                         sp="hsapiens", compareRef=FALSE, compareRefType="intersection", pathDb="reactome",
                         dep=NULL, depMeta=NULL, sizeDep=FALSE, showDepHist=TRUE, cellLineName="5637_URINARY_TRACT",
-                        showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=FALSE, bgColor="white", textColor="black",
+                        showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=TRUE, bgColor="white", textColor="black",
                         strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL) {
     
     if (is.null(expSample)) {expSample=colnames(exp)}
@@ -497,7 +508,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
         }
 
         if (strengthPlot){
-            p <- p / stp + plot_layout(nrow=2, ncol=1, height=c(0.8, 0.2))
+            p <- p / stp + plot_layout(nrow=2, ncol=1, heights=c(0.8, 0.2))
         }
 
         if (returnNet){

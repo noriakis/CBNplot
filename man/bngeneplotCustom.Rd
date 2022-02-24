@@ -34,7 +34,6 @@ bngeneplotCustom(
   orgDb = org.Hs.eg.db,
   cellLineName = "5637_URINARY_TRACT",
   fontFamily = "sans",
-  showLineage = FALSE,
   strengthPlot = FALSE,
   nStrength = 10,
   strThresh = NULL,
@@ -72,6 +71,8 @@ bngeneplotCustom(
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
+\item{interactive}{whether to use bnviewer (default to FALSE)}
+
 \item{cexCategory}{scaling factor of size of nodes}
 
 \item{cl}{cluster object from parallel::makeCluster()}
@@ -79,6 +80,8 @@ bngeneplotCustom(
 \item{showDir}{show the confidence of direction of edges}
 
 \item{chooseDir}{if undirected edges are present, choose direction of edges}
+
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
 
 \item{labelSize}{the size of label of the nodes}
 
@@ -88,15 +91,27 @@ bngeneplotCustom(
 
 \item{returnNet}{whether to return the network}
 
+\item{otherVar}{other variables to be included in the inference}
+
+\item{otherVarName}{the names of other variables}
+
+\item{onlyDf}{return only data.frame used for inference}
+
+\item{disc}{discretize the expressoin data}
+
+\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+
+\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+
 \item{dep}{the tibble storing dependency score from library depmap}
 
 \item{sizeDep}{whether to reflect DepMap score to the node size}
 
+\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+
 \item{cellLineName}{the cell line name to be included}
 
 \item{fontFamily}{font family name to be used for plotting}
-
-\item{showLineage}{show the dependency score across the lineage}
 
 \item{strengthPlot}{append the barplot depicting edges with high strength}
 
@@ -133,10 +148,6 @@ bngeneplotCustom(
 \item{barPanelGridCol}{panel grid color in barplot}
 
 \item{titleSize}{the size of title}
-
-\item{pathDb}{query to graphite::pathways(), default to "reactome"}
-
-\item{depMeta}{depmap::depmap_metadata(), needed for showLineage}
 }
 \value{
 ggplot2 object
@@ -145,5 +156,6 @@ ggplot2 object
 Plot gene relationship within the specified pathway using customized theme
 }
 \examples{
-bngeneplotCustom(results = pway, chooseDir=TRUE, pathNum=15, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans", exp = vsted, expSample=rownames(subset(meta, Condition=="T")))
+data("exampleEaRes");data("exampleGeneExp")
+res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, chooseDir=TRUE, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
 }

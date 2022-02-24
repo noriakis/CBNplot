@@ -7,6 +7,7 @@
 #' @param expRow the type of the identifier of rows of expression matrix
 #' @param expSample candidate rows to be included in the inference, default to all
 #' @param algo structure learning method used in boot.strength(), default to "hc"
+#' @param algorithm.args parameters to pass to bnlearn structure learnng function
 #' @param R the number of bootstrap
 #' @param color color of node, default to adjusted p-value
 #' @param cexCategory scaling factor of size of nodes
@@ -42,8 +43,17 @@
 #' @param barPanelGridCol panel grid color in barplot
 #' @param returnNet whether to return the network
 #' @param scoreType score type to use on inference
+#' @param disc discretize the expressoin data
+#' @param tr Specify data.frame if one needs to discretize as the same parameters as the other dataset
+#' @param remainCont Specify characters when perform discretization, if some columns are to be remain continuous
+#' @param otherVar other variables to be included in the inference
+#' @param otherVarName the names of other variables
+#' @param onlyDf return only data.frame used for inference
+#' @param orgDb perform clusterProfiler::setReadable based on this organism database
 #'
-#' @examples bnpathplotCustom(results = pway, fontFamily="sans", glowEdgeNum=3, hub=3, exp = vsted, expSample=rownames(subset(meta, Condition=="T")))
+#' @examples 
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp, fontFamily="sans", glowEdgeNum=3, hub=3)
 #' @return ggplot2 object
 #'
 #' @export
@@ -54,7 +64,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
                              qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15, cexLine=1, returnNet=FALSE,
                              dep=NULL, sizeDep=FALSE, cellLineName="5637_URINARY_TRACT", fontFamily="sans",
                              otherVar=NULL, otherVarName=NULL, onlyDf=FALSE, algorithm.args=NULL,
-                             showLineage=FALSE, strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
+                             strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
                              nodePal=c("blue","red"), edgePal=c("blue","red"), textCol="black", backCol="white",
                              barTextCol="black", barPal=c("red","blue"), barBackCol="white", scoreType="bic-g",
                              barLegendKeyCol="white", orgDb=org.Hs.eg.db, barAxisCol="black", barPanelGridCol="black") {
@@ -355,7 +365,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
         scale_edge_alpha(range=c(0.01, 0.1),guide="none")
 
     if (strengthPlot){
-        p <- p / stp + plot_layout(nrow=2, ncol=1, height=c(0.6, 0.4))
+        p <- p / stp + plot_layout(nrow=2, ncol=1, heights=c(0.6, 0.4))
     }
     if (returnNet){
         returnList <- list()

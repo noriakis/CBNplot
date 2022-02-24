@@ -32,7 +32,7 @@ bnpathplot(
   disc = FALSE,
   tr = NULL,
   remainCont = NULL,
-  shadowText = FALSE,
+  shadowText = TRUE,
   bgColor = "white",
   textColor = "black",
   compareRef = FALSE,
@@ -58,6 +58,8 @@ bnpathplot(
 \item{expSample}{candidate rows to be included in the inference, default to all}
 
 \item{algo}{structure learning method used in boot.strength(), default to "hc"}
+
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
@@ -89,11 +91,25 @@ bnpathplot(
 
 \item{showDir}{show the confidence of direction of edges}
 
+\item{delZeroDegree}{delete zero degree nodes}
+
 \item{labelSize}{the size of label of the nodes}
 
 \item{layout}{ggraph layout, default to "nicely"}
 
 \item{onlyDf}{return only data.frame used for inference}
+
+\item{disc}{discretize the expressoin data}
+
+\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+
+\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+
+\item{shadowText}{whether to use shadow text for the better readability (default: TRUE)}
+
+\item{bgColor}{color for text background when shadowText is TRUE}
+
+\item{textColor}{color for text when shadowText is TRUE}
 
 \item{compareRef}{whether compare to the reference network between pathway}
 
@@ -111,6 +127,10 @@ bnpathplot(
 
 \item{sizeDep}{whether to reflect DepMap score to the node size}
 
+\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+
+\item{edgeLink}{whether to set edge to geom_edge_link(), FALSE to use geom_edge_diagonal()}
+
 \item{cellLineName}{the cell line name to be included}
 
 \item{strengthPlot}{append the barplot depicting edges with high strength}
@@ -124,6 +144,7 @@ ggplot2 object
 Plot pathway relationship
 }
 \examples{
-bnpathplot(results = pway, exp = vsted, expSample = rownames(subset(meta, Condition=="T")), R = 10, expRow = "ENSEMBL")
+data("exampleEaRes");data("exampleGeneExp")
+res <- bnpathplot(results = exampleEaRes, exp = exampleGeneExp, R = 10, expRow = "ENSEMBL")
 
 }

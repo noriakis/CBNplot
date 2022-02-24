@@ -43,7 +43,7 @@ bngeneplot(
   cellLineName = "5637_URINARY_TRACT",
   showLineage = FALSE,
   orgDb = org.Hs.eg.db,
-  shadowText = FALSE,
+  shadowText = TRUE,
   bgColor = "white",
   textColor = "black",
   strengthPlot = FALSE,
@@ -64,6 +64,8 @@ bngeneplot(
 \item{R}{the number of bootstrap}
 
 \item{returnNet}{whether to return the network}
+
+\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
 
 \item{pathNum}{the pathway number (the number of row of the original result, ordered by p-value)}
 
@@ -91,11 +93,19 @@ bngeneplot(
 
 \item{strType}{"normal" or "ms" for multiscale implementation}
 
+\item{delZeroDegree}{delete zero degree nodes}
+
 \item{otherVar}{other variables to be included in the inference}
 
 \item{otherVarName}{the names of other variables}
 
 \item{onlyDf}{return only data.frame used for inference}
+
+\item{disc}{discretize the expressoin data}
+
+\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+
+\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
 
 \item{sp}{query to graphite::pathways(), default to "hsapiens"}
 
@@ -111,9 +121,19 @@ bngeneplot(
 
 \item{sizeDep}{whether to reflect DepMap score to the node size}
 
+\item{showDepHist}{whether to show depmap histogram}
+
 \item{cellLineName}{the cell line name to be included}
 
 \item{showLineage}{show the dependency score across the lineage}
+
+\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+
+\item{shadowText}{whether to use shadow text for the better readability (default: TRUE)}
+
+\item{bgColor}{color for text background when shadowText is TRUE}
+
+\item{textColor}{color for text when shadowText is TRUE}
 
 \item{strengthPlot}{append the barplot depicting edges with high strength}
 
@@ -130,6 +150,7 @@ ggplot2 object
 Plot gene relationship within the specified pathway
 }
 \examples{
-bngeneplot(results = pway, exp = vsted, expSample = rownames(subset(meta, Condition=="T")), pathNum = 17, R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
+data("exampleEaRes");data("exampleGeneExp")
+res <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
 
 }

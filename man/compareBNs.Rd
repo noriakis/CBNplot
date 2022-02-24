@@ -7,7 +7,7 @@
 compareBNs(listOfNets)
 }
 \arguments{
-\item{nets}{data frame to perform structure learning}
+\item{listOfNets}{list of networks}
 }
 \value{
 F-measures of each combination of network
@@ -16,5 +16,8 @@ F-measures of each combination of network
 Take the list of networks and returns the F-measures
 }
 \examples{
-compareBNs(nets)
+data("exampleEaRes");data("exampleGeneExp")
+net1 <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
+net2 <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
+res <- compareBNs(list(net1$av, net2$av))
 }
