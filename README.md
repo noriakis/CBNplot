@@ -1,5 +1,9 @@
 ## CBNplot: Bayesian network plot for the enrichment analysis results
 
+  <!-- badges: start -->
+  [![R-CMD-check](https://github.com/noriakis/wcGeneSummary/workflows/R-CMD-check/badge.svg)](https://github.com/noriakis/wcGeneSummary/actions)
+  <!-- badges: end -->
+
 Plot bayesian network inferred from expression data based on the enrichment analysis results from libraries including `clusterProfiler` and `ReactomePA` using `bnlearn`.
 
 ### Installation
