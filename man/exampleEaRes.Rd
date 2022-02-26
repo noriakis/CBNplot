@@ -8,7 +8,7 @@
 An object of class \code{enrichResult} with 47 rows and 9 columns.
 }
 \usage{
-exampleEaRes
+data(exampleEaRes)
 }
 \description{
 An example enrichment analysis result to be used for testing purpose
