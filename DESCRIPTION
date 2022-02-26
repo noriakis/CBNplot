@@ -13,3 +13,5 @@ Suggests: knitr, arules, concaveman, ReactomePA, bnviewer, DESeq2, GEOquery, rma
 biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
+URL: https://github.com/noriakis/CBNplot
+BugReports: https://github.com/noriakis/CBNplot/issues
