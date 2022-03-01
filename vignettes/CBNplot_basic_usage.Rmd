@@ -21,7 +21,7 @@ BiocManager::install("CBNplot")
 
 ## Usage
 ### The preprocessing and DEG identification of GSE133624
-```{r deg, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+```{r deg, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
 library(CBNplot)
 library(DESeq2)
 library(org.Hs.eg.db)
@@ -63,7 +63,7 @@ incSample = rownames(subset(meta, Condition=="T"))
 
 Then use CBNplot. Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
 
-```{r usecase, include=T, echo=T, message=FALSE, cache=T, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+```{r usecase, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
 bngeneplot(results = pway,exp = vsted, expSample = incSample, pathNum = 15)
 bnpathplot(results = pway,exp = vsted, expSample = incSample, shadowText = TRUE)
 bnpathplotCustom(results = pway, exp = vsted, expSample = incSample, fontFamily="sans", glowEdgeNum=3, hub=3)
