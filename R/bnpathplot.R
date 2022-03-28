@@ -79,7 +79,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
             } else if (attributes(results[[i]])$class[1]=="gseaResult"){
                 typeOfOntologies[[i]]=results[[i]]@setType
             }
-            results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
+            if (!is.null(orgDb)){
+                results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
+            }
         }
     } else {
         if (attributes(results)$class[1]=="enrichResult"){
@@ -87,7 +89,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
         } else if (attributes(results)$class[1]=="gseaResult"){
             typeOfOntology=results@setType
         }
-        results <- setReadable(results, OrgDb = orgDb)
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb = orgDb)
+        }
     }
 
     if (length(results)>1){
@@ -202,11 +206,12 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
         if (sizeDep) {
             pathDep = c(pathDep, -1 * mean((filteredDep %>% filter(gene_name %in% genesInPathway))$dependency))
         }
-
-        genesInPathway <- suppressMessages(clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb=org.Hs.eg.db)[expRow][,1])
+        if (!is.null(orgDb)){
+            genesInPathway <- suppressMessages(clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb=orgDb)[expRow][,1])
+        }
         pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
         if (dim(pathwayMatrix)[1]==0) {
             message("no gene in the pathway present in expression data")

@@ -80,7 +80,9 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    results <- setReadable(results, OrgDb=orgDb)
+    if (!is.null(orgDb)){
+        results <- setReadable(results, OrgDb=orgDb)
+    }
     tmpCol <- colnames(results@result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
@@ -109,14 +111,20 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     res <- results@result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
-    genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                            fromType="SYMBOL",
-                                            toType=expRow,
-                                            OrgDb=org.Hs.eg.db)[expRow][,1]
+    if (!is.null(orgDb)){
+        genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                fromType="SYMBOL",
+                                                toType=expRow,
+                                                OrgDb=orgDb)[expRow][,1]
+    }
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
     if (convertSymbol) {
-      matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=org.Hs.eg.db)
+      if (!is.null(orgDb)){
+          matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=orgDb)
+      }else{
+          matchTable <- rownames(pcs)
+      }
       if (sum(duplicated(matchTable[,1])) >= 1) {
         message("Removing expRow that matches the multiple symbols")
         matchTable <- matchTable[!matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
