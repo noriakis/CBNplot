@@ -45,7 +45,7 @@
 #' @param shadowText whether to use shadow text for the better readability (default: TRUE)
 #' @param bgColor color for text background when shadowText is TRUE
 #' @param textColor color for text when shadowText is TRUE
-#'
+#' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @return ggplot2 object
 #'
 #' @import ggraph ggplot2 patchwork igraph org.Hs.eg.db enrichplot ExperimentHub Rmpfr
@@ -68,7 +68,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
                       labelSize=4, layout="nicely", onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                       shadowText=TRUE, bgColor="white", textColor="black",
                       compareRef=FALSE, strThresh=NULL, strType="normal", hub=NULL, scoreType="bic-g", databasePal="Set2",
-                      dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, edgeLink=TRUE, cellLineName="5637_URINARY_TRACT", strengthPlot=FALSE, nStrength=10)
+                      dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, edgeLink=TRUE, cellLineName="5637_URINARY_TRACT", strengthPlot=FALSE, nStrength=10, seed = 1)
 {
     # Set type of ontology and rename
     if (length(results)>1){
@@ -254,9 +254,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
     }
 
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+      strength <- withr::with_seed(seed = seed ,boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+      strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     

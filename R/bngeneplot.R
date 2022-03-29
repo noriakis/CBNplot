@@ -47,7 +47,7 @@
 #' @param shadowText whether to use shadow text for the better readability (default: TRUE)
 #' @param bgColor color for text background when shadowText is TRUE
 #' @param textColor color for text when shadowText is TRUE
-#'
+#' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @return ggplot2 object
 #'
 #' @examples
@@ -68,7 +68,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
                         sp="hsapiens", compareRef=FALSE, compareRefType="intersection", pathDb="reactome",
                         dep=NULL, depMeta=NULL, sizeDep=FALSE, showDepHist=TRUE, cellLineName="5637_URINARY_TRACT",
                         showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=TRUE, bgColor="white", textColor="black",
-                        strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL) {
+                        strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, seed = 1) {
     
     if (is.null(expSample)) {expSample=colnames(exp)}
     if (compareRef & length(pathNum) > 1){stop("compareRef can be used with one pathNum or pathName.")}
@@ -132,18 +132,14 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
     if (expRow!="SYMBOL"){
-        if (convertSymbol) {
+        if (convertSymbol && !is.null(orgDb)) {
           # rn <- clusterProfiler::bitr(rownames(pcs),
           #                             fromType=expRow,
           #                             toType="SYMBOL",
           #                             OrgDb=org.Hs.eg.db)["SYMBOL"][,1]
           ## Change expression matrix rownames to symbol
           ## If one "expRow" hit to multiple symbols, delete the ID from the subsequent analysis, showing warning.
-          if(!is.null(orgDb)){
-              matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=orgDb)
-          }else{
-              matchTable <- rownames(pcs)
-          }
+          matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=orgDb)
           if (sum(duplicated(matchTable[,1])) >= 1) {
             message("Removing IDs that matches the multiple symbols")
             matchTable <- matchTable[!matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
@@ -234,9 +230,9 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
 
     ## Bootstrap-based inference
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+      strength <- withr::with_seed(seed = seed, boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+      strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     ## Barplot of edge strength

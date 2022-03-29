@@ -47,7 +47,8 @@ bnpathplot(
   edgeLink = TRUE,
   cellLineName = "5637_URINARY_TRACT",
   strengthPlot = FALSE,
-  nStrength = 10
+  nStrength = 10,
+  seed = 1
 )
 }
 \arguments{
@@ -136,6 +137,8 @@ bnpathplot(
 \item{strengthPlot}{append the barplot depicting edges with high strength}
 
 \item{nStrength}{specify how many edges are included in the strength plot}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
 }
 \value{
 ggplot2 object

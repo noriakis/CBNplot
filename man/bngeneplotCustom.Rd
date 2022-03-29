@@ -51,7 +51,8 @@ bngeneplotCustom(
   barLegendKeyCol = "white",
   barAxisCol = "black",
   barPanelGridCol = "black",
-  titleSize = 24
+  titleSize = 24,
+  seed = 1
 )
 }
 \arguments{
@@ -148,6 +149,8 @@ bngeneplotCustom(
 \item{barPanelGridCol}{panel grid color in barplot}
 
 \item{titleSize}{the size of title}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
 }
 \value{
 ggplot2 object
