@@ -49,7 +49,7 @@
 #' @param disc discretize the expressoin data
 #' @param tr Specify data.frame if one needs to discretize as the same parameters as the other dataset
 #' @param remainCont Specify characters when perform discretization, if some columns are to be remain continuous
-
+#' @param seed A random seed to make the analysis reproducible, default is 1.
 #' 
 #' @examples
 #' data("exampleEaRes");data("exampleGeneExp")
@@ -68,7 +68,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
                              strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
                              nodePal=c("blue","red"), edgePal=c("blue","red"), textCol="black", titleCol="black", backCol="white",
                              barTextCol="black", barPal=c("red","blue"), barBackCol="white", scoreType="bic-g",
-                             barLegendKeyCol="white", barAxisCol="black", barPanelGridCol="black", titleSize=24) {
+                             barLegendKeyCol="white", barAxisCol="black", barPanelGridCol="black", titleSize=24, seed = 1) {
     # if (is.null(hub) || is.null(glowEdgeNum) || hub <= 0 || glowEdgeNum <= 0) {stop("please specify number >= 1 for hub, glowEdgeNum")}
     if (length(nodePal)!=2 || length(edgePal)!=2 || length(barPal)!=2){stop("Please pick two colors for nodePal, edgePal and barPal.")}
     if (!is.numeric(pathNum)){stop("Please specify number(s) for pathNum.")}
@@ -80,7 +80,9 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    results <- setReadable(results, OrgDb=orgDb)
+    if (!is.null(orgDb)){
+        results <- setReadable(results, OrgDb=orgDb)
+    }
     tmpCol <- colnames(results@result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
@@ -109,14 +111,16 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     res <- results@result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
-    genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                            fromType="SYMBOL",
-                                            toType=expRow,
-                                            OrgDb=org.Hs.eg.db)[expRow][,1]
+    if (!is.null(orgDb)){
+        genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                fromType="SYMBOL",
+                                                toType=expRow,
+                                                OrgDb=orgDb)[expRow][,1]
+    }
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
-    if (convertSymbol) {
-      matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=org.Hs.eg.db)
+    if (convertSymbol && !is.null(orgDb)) {
+      matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=orgDb)
       if (sum(duplicated(matchTable[,1])) >= 1) {
         message("Removing expRow that matches the multiple symbols")
         matchTable <- matchTable[!matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
@@ -155,9 +159,9 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     }
 
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+      strength <- withr::with_seed(seed = seed, boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+      strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     if (strengthPlot){

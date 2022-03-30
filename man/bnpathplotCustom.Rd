@@ -52,7 +52,8 @@ bnpathplotCustom(
   barLegendKeyCol = "white",
   orgDb = org.Hs.eg.db,
   barAxisCol = "black",
-  barPanelGridCol = "black"
+  barPanelGridCol = "black",
+  seed = 1
 )
 }
 \arguments{
@@ -151,6 +152,8 @@ bnpathplotCustom(
 \item{barAxisCol}{axis color in barplot}
 
 \item{barPanelGridCol}{panel grid color in barplot}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
 }
 \value{
 ggplot2 object

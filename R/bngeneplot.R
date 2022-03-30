@@ -47,7 +47,7 @@
 #' @param shadowText whether to use shadow text for the better readability (default: TRUE)
 #' @param bgColor color for text background when shadowText is TRUE
 #' @param textColor color for text when shadowText is TRUE
-#'
+#' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @return ggplot2 object
 #'
 #' @examples
@@ -68,7 +68,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
                         sp="hsapiens", compareRef=FALSE, compareRefType="intersection", pathDb="reactome",
                         dep=NULL, depMeta=NULL, sizeDep=FALSE, showDepHist=TRUE, cellLineName="5637_URINARY_TRACT",
                         showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=TRUE, bgColor="white", textColor="black",
-                        strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL) {
+                        strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, seed = 1) {
     
     if (is.null(expSample)) {expSample=colnames(exp)}
     if (compareRef & length(pathNum) > 1){stop("compareRef can be used with one pathNum or pathName.")}
@@ -84,7 +84,9 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    results <- setReadable(results, OrgDb=orgDb)
+    if (!is.null(orgDb)){
+        results <- setReadable(results, OrgDb=orgDb)
+    }
     tmpCol <- colnames(results@result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
@@ -121,21 +123,23 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
     res <- results@result
 
     genesInPathway <- unique(unlist(strsplit(res[pathNum, ]$geneID, "/")))
-    genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                            fromType="SYMBOL",
-                                            toType=expRow,
-                                            OrgDb=org.Hs.eg.db)[expRow][,1]
+    if (!is.null(orgDb)) {
+        genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                fromType="SYMBOL",
+                                                toType=expRow,
+                                                OrgDb= orgDb )[expRow][,1]
+    }
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
     if (expRow!="SYMBOL"){
-        if (convertSymbol) {
+        if (convertSymbol && !is.null(orgDb)) {
           # rn <- clusterProfiler::bitr(rownames(pcs),
           #                             fromType=expRow,
           #                             toType="SYMBOL",
           #                             OrgDb=org.Hs.eg.db)["SYMBOL"][,1]
           ## Change expression matrix rownames to symbol
           ## If one "expRow" hit to multiple symbols, delete the ID from the subsequent analysis, showing warning.
-          matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=org.Hs.eg.db)
+          matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow, toType="SYMBOL", OrgDb=orgDb)
           if (sum(duplicated(matchTable[,1])) >= 1) {
             message("Removing IDs that matches the multiple symbols")
             matchTable <- matchTable[!matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
@@ -182,19 +186,21 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
             rownames(cls) <- cls$SYMBOL
 
         } else {
-            m <- clusterProfiler::bitr(clus$geneID,
-                                       fromType="SYMBOL",
-                                       toType=expRow,
-                                       OrgDb=org.Hs.eg.db)
-            colnames(m) <- c("geneID", expRow)
-            mcl <- merge(m, clus)
-            cnt <- mcl %>% group_by_at(expRow) %>%
-                arrange(Pathway, .by_group = TRUE) %>%
-                summarize(n=n(), Pathway=paste0(Pathway, collapse = " + "))
-            ovl <- cnt[cnt$n > 1,]
-            mclSub <- subset(mcl, mcl[expRow][,1] %in% as.character(as.matrix(cnt[cnt$n==1,][,expRow])))
-            cls <- data.frame(rbind(mclSub[,c(expRow,"Pathway")], ovl[,c(expRow,"Pathway")]))
-            rownames(cls) <- cls[, 1]
+            if (!is.null(orgDb)){
+                m <- clusterProfiler::bitr(clus$geneID,
+                                           fromType="SYMBOL",
+                                           toType=expRow,
+                                           OrgDb=orgDb)
+                colnames(m) <- c("geneID", expRow)
+                mcl <- merge(m, clus)
+                cnt <- mcl %>% group_by_at(expRow) %>%
+                    arrange(Pathway, .by_group = TRUE) %>%
+                    summarize(n=n(), Pathway=paste0(Pathway, collapse = " + "))
+                ovl <- cnt[cnt$n > 1,]
+                mclSub <- subset(mcl, mcl[expRow][,1] %in% as.character(as.matrix(cnt[cnt$n==1,][,expRow])))
+                cls <- data.frame(rbind(mclSub[,c(expRow,"Pathway")], ovl[,c(expRow,"Pathway")]))
+                rownames(cls) <- cls[, 1]
+            }
         }
     }
     
@@ -224,9 +230,9 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
 
     ## Bootstrap-based inference
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+      strength <- withr::with_seed(seed = seed, boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+      strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     ## Barplot of edge strength

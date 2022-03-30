@@ -50,7 +50,7 @@
 #' @param otherVarName the names of other variables
 #' @param onlyDf return only data.frame used for inference
 #' @param orgDb perform clusterProfiler::setReadable based on this organism database
-#'
+#' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @examples 
 #' data("exampleEaRes");data("exampleGeneExp")
 #' res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp, fontFamily="sans", glowEdgeNum=3, hub=3)
@@ -67,7 +67,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
                              strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
                              nodePal=c("blue","red"), edgePal=c("blue","red"), textCol="black", backCol="white",
                              barTextCol="black", barPal=c("red","blue"), barBackCol="white", scoreType="bic-g",
-                             barLegendKeyCol="white", orgDb=org.Hs.eg.db, barAxisCol="black", barPanelGridCol="black") {
+                             barLegendKeyCol="white", orgDb=org.Hs.eg.db, barAxisCol="black", barPanelGridCol="black", seed = 1) {
     # if (is.null(hub) || is.null(glowEdgeNum) || hub <= 0 || glowEdgeNum <= 0) {stop("please specify number >= 1 for hub, glowEdgeNum")}
     if (length(nodePal)!=2 || length(edgePal)!=2 || length(barPal)!=2){stop("Please pick two colors for nodePal, edgePal and barPal.")}
     if (compareRef){stop("compareRef is currently not supported.")}
@@ -84,7 +84,9 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
     } else if (attributes(results)$class[1]=="gseaResult"){
         typeOfOntology=results@setType
     }
-    results <- setReadable(results, OrgDb = orgDb)
+    if (!is.null(orgDb)){
+        results <- setReadable(results, OrgDb = orgDb)
+    }
 
     tmpCol <- colnames(results@result)
     ## Make comparable
@@ -122,12 +124,12 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
         if (sizeDep){
             pathDep = c(pathDep, -1 * mean((filteredDep %>% filter(gene_name %in% genesInPathway))$dependency))
         }
-
-        genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb=org.Hs.eg.db)[expRow][,1]
-
+        if (!is.null(orgDb)){
+            genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb=orgDb)[expRow][,1]
+        }
         pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
         if (dim(pathwayMatrix)[1]==0) {
             message("no gene in the pathway present in expression data")
@@ -166,9 +168,9 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
     }
 
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+      strength <- withr::with_seed(seed = seed, boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+      strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     if (strengthPlot){

@@ -49,7 +49,8 @@ bngeneplot(
   strengthPlot = FALSE,
   nStrength = 10,
   strThresh = NULL,
-  hub = NULL
+  hub = NULL,
+  seed = 1
 )
 }
 \arguments{
@@ -142,6 +143,8 @@ bngeneplot(
 \item{strThresh}{the threshold for strength}
 
 \item{hub}{visualize the genes with top-n hub scores}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
 }
 \value{
 ggplot2 object

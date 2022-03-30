@@ -45,7 +45,7 @@
 #' @param shadowText whether to use shadow text for the better readability (default: TRUE)
 #' @param bgColor color for text background when shadowText is TRUE
 #' @param textColor color for text when shadowText is TRUE
-#'
+#' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @return ggplot2 object
 #'
 #' @import ggraph ggplot2 patchwork igraph org.Hs.eg.db enrichplot ExperimentHub Rmpfr
@@ -68,7 +68,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
                       labelSize=4, layout="nicely", onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                       shadowText=TRUE, bgColor="white", textColor="black",
                       compareRef=FALSE, strThresh=NULL, strType="normal", hub=NULL, scoreType="bic-g", databasePal="Set2",
-                      dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, edgeLink=TRUE, cellLineName="5637_URINARY_TRACT", strengthPlot=FALSE, nStrength=10)
+                      dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db, edgeLink=TRUE, cellLineName="5637_URINARY_TRACT", strengthPlot=FALSE, nStrength=10, seed = 1)
 {
     # Set type of ontology and rename
     if (length(results)>1){
@@ -79,7 +79,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
             } else if (attributes(results[[i]])$class[1]=="gseaResult"){
                 typeOfOntologies[[i]]=results[[i]]@setType
             }
-            results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
+            if (!is.null(orgDb)){
+                results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
+            }
         }
     } else {
         if (attributes(results)$class[1]=="enrichResult"){
@@ -87,7 +89,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
         } else if (attributes(results)$class[1]=="gseaResult"){
             typeOfOntology=results@setType
         }
-        results <- setReadable(results, OrgDb = orgDb)
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb = orgDb)
+        }
     }
 
     if (length(results)>1){
@@ -202,11 +206,12 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
         if (sizeDep) {
             pathDep = c(pathDep, -1 * mean((filteredDep %>% filter(gene_name %in% genesInPathway))$dependency))
         }
-
-        genesInPathway <- suppressMessages(clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb=org.Hs.eg.db)[expRow][,1])
+        if (!is.null(orgDb)){
+            genesInPathway <- suppressMessages(clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb=orgDb)[expRow][,1])
+        }
         pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
         if (dim(pathwayMatrix)[1]==0) {
             message("no gene in the pathway present in expression data")
@@ -249,9 +254,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
     }
 
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+      strength <- withr::with_seed(seed = seed ,boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+      strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     
