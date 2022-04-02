@@ -25,9 +25,9 @@ install_github("noriakis/CBNplot")
 - The plot is customizable highliting edges and nodes like hub genes.
 <img src="https://github.com/noriakis/software/blob/main/images/CBNplot_readme_2.png?raw=true" width="800px">
 
-- The example using `MicrobiomeProfiler`, thanks to the fix by @xiangpin.
+- The example using `MicrobiomeProfiler`, thanks to the fix by [@xiangpin](https://github.com/xiangpin/).
 ``` R
-library(MicrobiomeProfiler)
+library(MicrobiomeProfiler)]
 data(Rat_data)
 ko.res <- enrichKO(Rat_data)
 exp.dat <- matrix(abs(rnorm(910)), 91, 10) %>% magrittr::set_rownames(value=Rat_data) %>% magrittr::set_colnames(value=paste0('S', seq_len(ncol(.))))
