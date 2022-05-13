@@ -8,7 +8,7 @@ queryCpDistLw(
   fitted,
   candidate,
   evidence,
-  level,
+  levels,
   point = FALSE,
   pointSize = 5,
   alpha = TRUE,
@@ -22,7 +22,7 @@ queryCpDistLw(
 
 \item{evidence}{evidence variable name}
 
-\item{level}{level to be listed}
+\item{levels}{level to be listed}
 
 \item{point}{geom_point the weighted mean}
 
@@ -36,8 +36,16 @@ queryCpDistLw(
 list of dataframe containing raw values
 }
 \description{
-produce a plot of bnlearn::cpdist by performing bnlearn::cpdist on specified node, evidence and level.
+produce a plot of bnlearn::cpdist by performing bnlearn::cpdist
+on specified node, evidence and level.
 }
 \examples{
-\dontrun{queryCpDistLw(fitted, candidate="COL25A1", evidence = "Treatment", level=rownames(fitted$Treatment$prob))}
+library(bnlearn)
+data("exampleEaRes")
+data("exampleGeneExp")
+net <- bngeneplot(exampleEaRes, exampleGeneExp,
+                  pathNum=1, returnNet=TRUE)
+fitted <- bn.fit(net$av, net$df)
+res <- queryCpDistLw(fitted, candidate="ERCC4", evidence="ERCC2",
+                     levels=c(0.1, 0.5, 0.8), n=500)
 }

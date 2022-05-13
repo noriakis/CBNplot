@@ -19,10 +19,16 @@ queryCpDistLs(fitted, candidate, evidences, discPalette = "Set2", ...)
 }
 \value{
 list of dataframe containing raw values
+library(bnlearn)
+data("exampleEaRes")
+data("exampleGeneExp")
+net <- bngeneplot(exampleEaRes, exampleGeneExp,
+                  pathNum=1, returnNet=TRUE)
+fitted <- bn.fit(net$av, net$df)
+res <- queryCpDistLs(fitted, candidate="ERCC4",
+              evidences=c("ERCC2<0.1","ERCC2>0.5","ERCC2>0.8"), n=500)
 }
 \description{
-produce a plot of bnlearn::cpdist by performing bnlearn::cpdist on specified node, evidence and level.
-}
-\examples{
-\dontrun{queryCpDistLs(fitted, candidate="Mitotic Spindle Checkpoint", evidences=c("TP53<0.5","TP53>0.5","TP53>0.8"), n=5000)}
+produce a plot of bnlearn::cpdist by performing bnlearn::cpdist
+on specified node, evidence and level.
 }
