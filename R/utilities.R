@@ -475,7 +475,7 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
     # averageBf <- cextend(averageBf, strict=FALSE)
 
     for (r in Rrange){
-        cat(paste("performing R:", r, "\n"))
+        # cat(paste("performing R:", r, "\n"))
         strength <- boot.strength(pcs, algorithm=algo, R=r, cluster=cl, algorithm.args=NULL)
         strList[[paste0("R",r)]] <- strength
         av <- averaged.network(strength)
@@ -578,7 +578,7 @@ bngenetest <- function (results, exp, expSample=NULL, algo="hc",
     # averageBf <- cextend(averageBf, strict=FALSE)
 
     for (r in Rrange){
-        cat(paste("performing R:", r, "\n"))
+        # cat(paste("performing R:", r, "\n"))
         strength <- boot.strength(pcs, algorithm=algo,
             algorithm.args=algorithm.args, R=r, cluster=cl)
         strList[[paste0("R",r)]] <- strength
