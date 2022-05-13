@@ -238,7 +238,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
         filteredDep <- filteredDep %>% filter(gene_name %in% names(V(g))) %>%
             arrange(match(gene_name, names(V(g))))
         # Subset to those dependency scores are available
-        depSubG <- V(g)[names(V(g)) %in% c(filteredDep$gene_name) || names(V(g)) %in% tail(colnames(pcs), n=dim(otherVar)[2])]
+        depSubG <- V(g)[names(V(g)) %in% c(filteredDep$gene_name) | names(V(g)) %in% tail(colnames(pcs), n=dim(otherVar)[2])]
         g <- igraph::subgraph(g, depSubG)
         V(g)$size <- vapply(names(V(g)), function(x) ifelse(x %in% filteredDep$gene_name, -1 * as.numeric(subset(filteredDep, gene_name==x)$dependency), NA), FUN.VALUE=1)#-1 * filteredDep$dependency
         #meanExp <- apply(pcs[, names(V(g))], 2, mean)
