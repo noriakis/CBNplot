@@ -384,3 +384,217 @@ compareBNs <- function(listOfNets){
   }
   return(fms)
 }
+
+#' bnpathtest
+#'
+#' Testing various R for bayesian network between pathways
+#'
+#' @param results the enrichment analysis result
+#' @param exp gene expression matrix
+#' @param expRow the type of the identifier of rows of expression matrix
+#' @param expSample candidate rows to be included in the inference
+#'                  default to all
+#' @param algo structure learning method used in boot.strength()
+#'             default to "hc"
+#' @param algorithm.args parameters to pass to
+#'                       bnlearn structure learnng function
+#' @param cl cluster object from parallel::makeCluster()
+#' @param qvalueCutOff the cutoff value for qvalue
+#' @param adjpCutOff the cutoff value for adjusted pvalues
+#' @param nCategory the number of pathways to be included
+#' @param Rrange the sequence of R values to be tested
+#' @param scoreType return the specified scores
+#' @param orgDb perform clusterProfiler::setReadable
+#'              based on this organism database
+#' @return list of graphs and scores
+#' @examples
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bnpathtest(results = exampleEaRes, exp = exampleGeneExp,
+#'        algo="hc", Rrange=seq(10, 30, 10), expRow = "ENSEMBL",
+#'        scoreType="bge")
+#' @export
+#'
+bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
+                        algorithm.args=NULL, expRow="ENSEMBL", cl=NULL,
+                        orgDb=org.Hs.eg.db,
+                        qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15,
+                        Rrange=seq(2,40,2), scoreType="aic-g")
+{
+    if (!is.null(orgDb)){
+        results <- clusterProfiler::setReadable(results, OrgDb=orgDb)
+    }
+    if (is.null(expSample)) {expSample=colnames(exp)}
+    # if (results@keytype == "kegg"){
+    #     resultsGeneType <- "ENTREZID"
+    # } else {
+    #     resultsGeneType <- results@keytype
+    # }
+
+    res <- results@result
+    if (!is.null(qvalueCutOff)) { res <- subset(res, qvalue < qvalueCutOff) }
+    if (!is.null(adjpCutOff)) { res <- subset(res, p.adjust < adjpCutOff) }
+    if (nCategory) {
+        res <- res[seq_len(nCategory),]
+        res <- res[!is.na(res$ID),]
+    }
+
+
+    pcs <- c()
+    pwayNames <- c()
+    for (i in seq_len(length(rownames(res)))) {
+        genesInPathway <- strsplit(res[i, ]$geneID, "/")[[1]]
+        if (!is.null(orgDb)){
+            genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb=orgDb)[expRow][,1]
+        }
+        pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway),
+                            expSample ]
+        if (dim(pathwayMatrix)[1]==0) {
+            message("no gene in the pathway present in expression data")
+        } else {
+            pathwayMatrixPca <- prcomp(t(pathwayMatrix), scale. = FALSE)$x[,1]
+            avExp <- apply(pathwayMatrix, 2, mean)
+            corFlag <- cor(pathwayMatrixPca, avExp)
+            if (corFlag < 0){pathwayMatrixPca <- pathwayMatrixPca*-1}
+            # pathwayMatrixSum <- apply(pathwayMatrix, 2, sum)
+            pwayNames <- c(pwayNames, res[i,]$Description)
+            pcs <- cbind(pcs, pathwayMatrixPca)
+        }
+    }
+    colnames(pcs) <- pwayNames
+    pcs <- data.frame(pcs, check.names=FALSE)
+
+    strList <- list()
+    graphList <- list()
+    scoreList <- list()
+
+    # strengthBf <- bf.strength(hc(pcs), pcs)
+    # averageBf <- averaged.network(strengthBf)
+    # averageBf <- cextend(averageBf, strict=FALSE)
+
+    for (r in Rrange){
+        cat(paste("performing R:", r, "\n"))
+        strength <- boot.strength(pcs, algorithm=algo, R=r, cluster=cl, algorithm.args=NULL)
+        strList[[paste0("R",r)]] <- strength
+        av <- averaged.network(strength)
+        # Infer the edge direction by default
+        # av <- chooseEdgeDir(av, pcs, scoreType)
+        av <- cextend(av, strict=FALSE)
+
+        if (is.dag(bnlearn::as.igraph(av))){
+            graphList[[paste0("R",r)]] <- av
+            scoreList[[paste0("R",r)]] <- score(av, pcs, scoreType)
+        } else {
+            graphList[[paste0("R",r)]] <- av
+            scoreList[[paste0("R",r)]] <- NA
+        }
+    }
+
+    return(list("df"=pcs, "str"=strList, "graph"=graphList, "score"=scoreList))
+}
+
+
+#' bngenetest
+#'
+#' Testing various R for bayesian network between genes
+#'
+#' @param results the enrichment analysis result
+#' @param exp gene expression matrix
+#' @param expRow the type of the identifier of rows of expression matrix
+#' @param expSample candidate rows to be included in the inference
+#'                  default to all
+#' @param algo structure learning method used in boot.strength()
+#'             default to "hc"
+#' @param algorithm.args parameters to pass to
+#'                       bnlearn structure learnng function
+#' @param cl cluster object from parallel::makeCluster()
+#' @param Rrange the sequence of R values to be tested
+#' @param scoreType return the specified scores
+#' @param convertSymbol whether the label of resulting network is
+#'                      converted to symbol, default to TRUE
+#' @param pathNum the pathway number (the number of row of the original result,
+#'                                    ordered by p-value)
+#' @param orgDb perform clusterProfiler::setReadable
+#'              based on this organism database
+#'
+#' @return list of graphs and scores
+#' @examples
+#' data("exampleEaRes");data("exampleGeneExp")
+#' res <- bngenetest(results = exampleEaRes, exp = exampleGeneExp,
+#' algo="hc", Rrange=seq(10, 30, 10), pathNum=1, scoreType="bge")
+#' @export
+#'
+bngenetest <- function (results, exp, expSample=NULL, algo="hc",
+                        Rrange=seq(2,40,2), cl=NULL, algorithm.args=NULL,
+                        pathNum=NULL, convertSymbol=TRUE, expRow="ENSEMBL",
+                        scoreType="aic-g", orgDb=org.Hs.eg.db)
+{
+    # if (results@keytype == "kegg"){
+    #     resultsGeneType <- "ENTREZID"
+    # } else {
+    #     resultsGeneType <- results@keytype
+    # }
+    if (!is.null(orgDb)){
+        results <- setReadable(results, OrgDb=orgDb)
+    }
+    if (is.null(expSample)) {expSample=colnames(exp)}
+    res <- results@result
+
+    genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
+
+    if (!is.null(orgDb)){
+        genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                fromType="SYMBOL",
+                                                toType=expRow,
+                                                OrgDb=orgDb)[expRow][,1]
+    }
+
+    pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
+
+    if (convertSymbol) {
+          matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
+                                toType="SYMBOL", OrgDb=orgDb)
+          if (sum(duplicated(matchTable[,1])) >= 1) {
+            message("Removing expRow that matches the multiple symbols")
+            matchTable <- matchTable[
+            !matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
+          }
+          rnSym <- matchTable["SYMBOL"][,1]
+          rnExp <- matchTable[expRow][,1]
+          pcs <- pcs[rnExp, ]
+          rownames(pcs) <- rnSym
+    }
+
+    pcs <- data.frame(t(pcs))
+
+    strList <- list()
+    graphList <- list()
+    scoreList <- list()
+
+    # strengthBf <- bf.strength(hc(pcs), pcs)
+    # averageBf <- averaged.network(strengthBf)
+    # averageBf <- cextend(averageBf, strict=FALSE)
+
+    for (r in Rrange){
+        cat(paste("performing R:", r, "\n"))
+        strength <- boot.strength(pcs, algorithm=algo,
+            algorithm.args=algorithm.args, R=r, cluster=cl)
+        strList[[paste0("R",r)]] <- strength
+        av <- averaged.network(strength)
+        # Infer the edge direction by default
+        # av <- chooseEdgeDir(av, pcs, scoreType)
+        av <- cextend(av, strict=FALSE)
+
+        if (is.dag(bnlearn::as.igraph(av))){
+            graphList[[paste0("R",r)]] <- av
+            scoreList[[paste0("R",r)]] <- score(av, pcs, scoreType)
+        } else {
+            graphList[[paste0("R",r)]] <- av
+            scoreList[[paste0("R",r)]] <- NA
+        }
+    }
+
+    return(list("df"=pcs, "str"=strList, "graph"=graphList, "score"=scoreList))
+}

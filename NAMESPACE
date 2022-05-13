@@ -2,8 +2,10 @@
 
 export(bngeneplot)
 export(bngeneplotCustom)
+export(bngenetest)
 export(bnpathplot)
 export(bnpathplotCustom)
+export(bnpathtest)
 export(compareBNs)
 export(obtainPath)
 export(queryCpDistLs)
