@@ -11,6 +11,7 @@
 #'
 #' @importFrom dplyr mutate
 #' @return list of dataframe containing raw values
+#' @examples
 #' library(bnlearn)
 #' data("exampleEaRes")
 #' data("exampleGeneExp")
@@ -29,19 +30,19 @@ queryCpDistLs <- function (fitted, candidate,
             tmp <- unlist(strsplit(e,"<="));
             newe <- paste0("`",tmp[1],"`<= ",tmp[2]);
             evRenamed <- c(evRenamed, newe)}
-      else if (grepl(">=",e,fixed = TRUE)) {
+        else if (grepl(">=",e,fixed = TRUE)) {
             tmp <- unlist(strsplit(e,">="));
             newe <- paste0("`",tmp[1],"`>= ",tmp[2]);
             evRenamed <- c(evRenamed, newe)}
-      else if (grepl("<",e,fixed = TRUE)) {
+        else if (grepl("<",e,fixed = TRUE)) {
             tmp <- unlist(strsplit(e,"<"));
             newe <- paste0("`",tmp[1],"`< ",tmp[2]);
             evRenamed <- c(evRenamed, newe)}
-      else if (grepl(">",e,fixed = TRUE)) {
+        else if (grepl(">",e,fixed = TRUE)) {
             tmp <- unlist(strsplit(e,">"));
             newe <- paste0("`",tmp[1],"`> ",tmp[2]);
             evRenamed <- c(evRenamed, newe)}
-      else if (grepl("==",e,fixed = TRUE)) {
+        else if (grepl("==",e,fixed = TRUE)) {
             tmp <- unlist(strsplit(e,"=="));
             newe <- paste0("`",tmp[1],"`== ",tmp[2]);
             evRenamed <- c(evRenamed, newe)}
@@ -166,18 +167,18 @@ queryCpDistLw <- function (fitted, candidate, evidence, levels, point=FALSE,
         ## Points are colored | set alpha by their weights
         if (alpha){
             p <- conc %>% ggplot()+
-                  ggdist::geom_dots(aes(y=level,
+                ggdist::geom_dots(aes(y=level,
                     x=get(candidate), fill=level, alpha=weights), color=NA)+
-                  theme_bw()+xlab(candidate)+ylab(evidence)
+                    theme_bw()+xlab(candidate)+ylab(evidence)
             if (point) {p <- p + geom_point(wm,
                 mapping=aes(x=get(candidate), y=level, fill=level),
                 shape=21, size=pointSize) }
         } else {
             p <- conc %>% ggplot()+
-                  ggdist::geom_dots(aes(y=level,
+                ggdist::geom_dots(aes(y=level,
                     x=get(candidate), fill=weights), color=NA)+
-                  scale_fill_ramp_continuous()+
-                  theme_bw()+xlab(candidate)+ylab(evidence)
+                    scale_fill_ramp_continuous()+
+                    theme_bw()+xlab(candidate)+ylab(evidence)
             if (point) {p <- p + geom_point(wm,
                 mapping=aes(x=get(candidate), y=level), color="tomato",
                 size=pointSize) }
@@ -266,7 +267,7 @@ discDF <- function(df, tr=NULL, remainCont=NULL) {
     if (is.null(tr)) {
         discMeth <- list()
         for ( i in names(df)){
-          if (i %in% remainCont){
+            if (i %in% remainCont){
                 discMeth[[i]] <- list(method="none")
             } else {
                 discMeth[[i]] <- list(method="cluster")
@@ -349,8 +350,8 @@ obtainPath <- function(res, geneSymbol) {
     # candidateGene <- clusterProfiler::bitr(geneSymbol, fromType = "SYMBOL",
     # toType = tot, org.Hs.eg.db)[tot]
     res@result <- res@result[unlist(map(map(res@result$geneID,
-                           function (x) unlist(strsplit(x, "/"))),
-                           function(x) geneSymbol %in% x)),]
+                            function (x) unlist(strsplit(x, "/"))),
+                            function(x) geneSymbol %in% x)),]
     return(res)
 }
 
@@ -370,19 +371,20 @@ obtainPath <- function(res, geneSymbol) {
 #' res <- compareBNs(list(net1$av, net2$av))
 #' @export
 compareBNs <- function(listOfNets){
-  if (length(listOfNets)<2){
-    stop("please provide multiple networks from bnlearn")
-  }
-  fms <- c()
-  cmb <- combn(seq_len(length(listOfNets)), m=2)
-  for (i in seq_len(ncol(cmb))){
-    compareRes <- bnlearn::compare(listOfNets[[cmb[,i][1]]], listOfNets[[cmb[,i][2]]])
-    prec <- compareRes$tp/(compareRes$fp+compareRes$tp)
-    recall <- compareRes$tp/(compareRes$fn+compareRes$tp)
-    fm <- 2 * prec * recall / (recall + prec)
-    fms <- c(fms, fm)
-  }
-  return(fms)
+    if (length(listOfNets)<2){
+        stop("please provide multiple networks from bnlearn")
+    }
+    fms <- c()
+    cmb <- combn(seq_len(length(listOfNets)), m=2)
+    for (i in seq_len(ncol(cmb))){
+        compareRes <- bnlearn::compare(listOfNets[[cmb[,i][1]]],
+            listOfNets[[cmb[,i][2]]])
+        prec <- compareRes$tp/(compareRes$fp+compareRes$tp)
+        recall <- compareRes$tp/(compareRes$fn+compareRes$tp)
+        fm <- 2 * prec * recall / (recall + prec)
+        fms <- c(fms, fm)
+    }
+    return(fms)
 }
 
 #' bnpathtest
@@ -423,7 +425,7 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
     if (!is.null(orgDb)){
         results <- clusterProfiler::setReadable(results, OrgDb=orgDb)
     }
-    if (is.null(expSample)) {expSample=colnames(exp)}
+    if (is.null(expSample)) {expSample <- colnames(exp)}
     # if (results@keytype == "kegg"){
     #     resultsGeneType <- "ENTREZID"
     # } else {
@@ -476,7 +478,8 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
 
     for (r in Rrange){
         # cat(paste("performing R:", r, "\n"))
-        strength <- boot.strength(pcs, algorithm=algo, R=r, cluster=cl, algorithm.args=NULL)
+        strength <- boot.strength(pcs, algorithm=algo,
+            R=r, cluster=cl, algorithm.args=NULL)
         strList[[paste0("R",r)]] <- strength
         av <- averaged.network(strength)
         # Infer the edge direction by default
@@ -539,7 +542,7 @@ bngenetest <- function (results, exp, expSample=NULL, algo="hc",
     if (!is.null(orgDb)){
         results <- setReadable(results, OrgDb=orgDb)
     }
-    if (is.null(expSample)) {expSample=colnames(exp)}
+    if (is.null(expSample)) {expSample <- colnames(exp)}
     res <- results@result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
@@ -554,17 +557,18 @@ bngenetest <- function (results, exp, expSample=NULL, algo="hc",
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
     if (convertSymbol) {
-          matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
+            matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
                                 toType="SYMBOL", OrgDb=orgDb)
-          if (sum(duplicated(matchTable[,1])) >= 1) {
-            message("Removing expRow that matches the multiple symbols")
-            matchTable <- matchTable[
-            !matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
-          }
-          rnSym <- matchTable["SYMBOL"][,1]
-          rnExp <- matchTable[expRow][,1]
-          pcs <- pcs[rnExp, ]
-          rownames(pcs) <- rnSym
+            if (sum(duplicated(matchTable[,1])) >= 1) {
+                message("Removing expRow that matches the multiple symbols")
+                matchTable <- matchTable[
+                    !matchTable[,1] %in% matchTable[,1][
+                        duplicated(matchTable[,1])],]
+            }
+            rnSym <- matchTable["SYMBOL"][,1]
+            rnExp <- matchTable[expRow][,1]
+            pcs <- pcs[rnExp, ]
+            rownames(pcs) <- rnSym
     }
 
     pcs <- data.frame(t(pcs))
