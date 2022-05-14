@@ -160,5 +160,5 @@ Plot gene relationship within the specified pathway using customized theme
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, chooseDir=TRUE, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
+res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
 }

@@ -53,7 +53,7 @@
 #' 
 #' @examples
 #' data("exampleEaRes");data("exampleGeneExp")
-#' res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, chooseDir=TRUE, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
+#' res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
 #' @return ggplot2 object
 #'
 #' @export
@@ -194,9 +194,9 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
         av <- averaged.network(strength)
     }
 
-    if (chooseDir){
-        av <- chooseEdgeDir(av, pcs, scoreType)
-    }
+    # if (chooseDir){
+    #     av <- chooseEdgeDir(av, pcs, scoreType)
+    # }
 
     av <- cextend(av, strict=FALSE)
 

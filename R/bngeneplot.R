@@ -253,9 +253,9 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
         av <- averaged.network(strength)
     }
 
-    if (chooseDir){
-        av <- chooseEdgeDir(av, pcs, scoreType)
-    }
+    # if (chooseDir){
+    #     av <- chooseEdgeDir(av, pcs, scoreType)
+    # }
 
     av <- cextend(av, strict=FALSE)
 

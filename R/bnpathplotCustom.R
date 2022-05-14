@@ -203,9 +203,9 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
         av <- averaged.network(strength)
     }
 
-    if (chooseDir){
-        av <- chooseEdgeDir(av, pcs, scoreType)
-    }
+    # if (chooseDir){
+    #     av <- chooseEdgeDir(av, pcs, scoreType)
+    # }
 
     av <- cextend(av, strict=FALSE)
 
