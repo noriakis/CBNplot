@@ -73,7 +73,11 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     if (length(nodePal)!=2 || length(edgePal)!=2 || length(barPal)!=2){stop("Please pick two colors for nodePal, edgePal and barPal.")}
     if (!is.numeric(pathNum)){stop("Please specify number(s) for pathNum.")}
     if (is.null(expSample)) {expSample=colnames(exp)}
-    
+    if (results@ontology=="Reactome") {
+        if (grepl("Homo sapiens\r: ", results@result$Description[1], fixed = TRUE))
+            results@result$Description <- vapply(strsplit(results@result$Description, "\r: "),
+                "[", 2, FUN.VALUE="character")
+    }
     ## Deprecated
     # if (results@keytype == "kegg"){
     #     resultsGeneType <- "ENTREZID"

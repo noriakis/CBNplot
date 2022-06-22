@@ -82,6 +82,11 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc", algorithm.args=
             if (!is.null(orgDb)){
                 results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
             }
+            if (results[[i]]@ontology=="Reactome") {
+                if (grepl("Homo sapiens\r: ", results[[i]]@result$Description[1], fixed = TRUE))
+                    results[[i]]@result$Description <- vapply(strsplit(results[[i]]@result$Description, "\r: "),
+                        "[", 2, FUN.VALUE="character")
+            }
         }
     } else {
         if (attributes(results)$class[1]=="enrichResult"){

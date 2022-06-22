@@ -78,7 +78,11 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20, returnNet
     if (sizeDep & length(pathNum) > 1){stop("sizeDep can be used with one pathNum.")}
     if (compareRef & is.null(pathDb)){stop("please specify which database to use as reference.")}
     if (showLineage & strengthPlot){stop("please specify one of showLineage or strengthPlot.")}
-
+    if (results@ontology=="Reactome") {
+        if (grepl("Homo sapiens\r: ", results@result$Description[1], fixed = TRUE))
+            results@result$Description <- vapply(strsplit(results@result$Description, "\r: "),
+                "[", 2, FUN.VALUE="character")
+    }
     # if (results@keytype == "kegg"){
     #     resultsGeneType <- "ENTREZID"
     # } else {

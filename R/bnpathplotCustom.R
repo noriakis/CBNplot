@@ -78,7 +78,11 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-
+    if (results@ontology=="Reactome") {
+        if (grepl("Homo sapiens\r: ", results@result$Description[1], fixed = TRUE))
+            results@result$Description <- vapply(strsplit(results@result$Description, "\r: "),
+                "[", 2, FUN.VALUE="character")
+    }
     if (attributes(results)$class[1]=="enrichResult"){
         typeOfOntology=results@ontology
     } else if (attributes(results)$class[1]=="gseaResult"){
