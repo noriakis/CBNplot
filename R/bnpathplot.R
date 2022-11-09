@@ -49,7 +49,7 @@
 #' @return ggplot2 object
 #'
 #' @import ggraph ggplot2 patchwork igraph org.Hs.eg.db enrichplot ExperimentHub Rmpfr
-#' @importFrom bnlearn score boot.strength averaged.network cextend undirected.arcs choose.direction
+#' @importFrom bnlearn score boot.strength averaged.network cextend undirected.arcs
 #' @importFrom magrittr "%>%"
 #' @importFrom dplyr group_by_at filter select
 #' @importFrom utils read.csv
