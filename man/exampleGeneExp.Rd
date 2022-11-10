@@ -11,6 +11,8 @@ An object of class \code{data.frame} with 7 rows and 100 columns.
 data(exampleGeneExp)
 }
 \description{
-An example gene expression data to be used for testing purpose made by runif()
+An example gene expression data to be used for testing purpose
+made by runif() for ERCC genes and 100 samples.
+No biological meanings can be obtained from the data.
 }
 \keyword{datasets}

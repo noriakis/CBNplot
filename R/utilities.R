@@ -60,12 +60,12 @@ queryCpDistLs <- function (fitted, candidate,
         returnList <- list()
         returnList[["df"]] <- conc
         groupedDf <- conc %>%
-                    group_by(level, !!!syms(candidate)) %>%
+                    group_by(.data$level, !!!syms(candidate)) %>%
                     summarise(n = n()) %>%
                     mutate(freq = n / sum(n))
         groupedPlot <- groupedDf %>% 
-                    ggplot(aes(level,freq,
-                        fill=eval(parse(text=candidate))))+
+                    ggplot(aes_(~level,~freq,
+                        fill=candidate))+
                     geom_bar(stat="identity",position='dodge')+
                     theme_bw()+scale_fill_brewer(palette=discPalette)
 
@@ -87,19 +87,22 @@ queryCpDistLs <- function (fitted, candidate,
     returnList[["df"]] <- conc
 
     if (length(candidate)==1){
-        disMean <- conc %>% group_by(level) %>%
+        disMean <- conc %>% group_by(.data$level) %>%
                     summarise(mean=mean(get(candidate)), n=n())
         disMean$label <- paste0(disMean$level,
             " (mean=", round(disMean$mean,3), ")")
         lb <- c()
         for (nm in unique(conc$level)) {
-            lab <- as.character(disMean %>% filter(level==nm) %>% select(label))
-            num <- as.numeric(disMean %>% filter(level==nm) %>% select(n))
+            lab <- as.character(disMean %>%
+                filter(.data$level==nm) %>% select(.data$label))
+            num <- as.numeric(disMean %>%
+                filter(.data$level==nm) %>% select(n))
             lb <- c(lb, rep(lab, num))
         }
         conc$label <- lb
         p <- conc %>%
-            ggplot(aes(y=level, x=get(candidate), color=label, fill=label)) +
+            ggplot(aes_(y=~level, x=candidate,
+                color=~label, fill=~label)) +
             ggdist::stat_dotsinterval()+
             theme_bw() + xlab(candidate)
         returnList[["plot"]] <- p
@@ -158,7 +161,7 @@ queryCpDistLw <- function (fitted, candidate, evidence, levels, point=FALSE,
     
     colnames(conc) <- c(candidate, "weights", "level")
     conc$level <- factor(conc$level)
-    wm <- conc %>% group_by(level) %>%
+    wm <- conc %>% group_by(.data$level) %>%
             dplyr::summarise_at(candidate, ~ weighted.mean(., weights))
     returnList <- list()
     returnList[["df"]] <- conc
@@ -167,20 +170,20 @@ queryCpDistLw <- function (fitted, candidate, evidence, levels, point=FALSE,
         ## Points are colored | set alpha by their weights
         if (alpha){
             p <- conc %>% ggplot()+
-                ggdist::geom_dots(aes(y=level,
-                    x=get(candidate), fill=level, alpha=weights), color=NA)+
+                ggdist::geom_dots(aes_(y=~level,
+                    x=candidate, fill=~level, alpha=~weights), color=NA)+
                     theme_bw()+xlab(candidate)+ylab(evidence)
             if (point) {p <- p + geom_point(wm,
-                mapping=aes(x=get(candidate), y=level, fill=level),
+                mapping=aes_(x=candidate, y=~level, fill=~level),
                 shape=21, size=pointSize) }
         } else {
             p <- conc %>% ggplot()+
-                ggdist::geom_dots(aes(y=level,
-                    x=get(candidate), fill=weights), color=NA)+
+                ggdist::geom_dots(aes_(y=~level,
+                    x=candidate, fill=~weights), color=NA)+
                     scale_fill_ramp_continuous()+
                     theme_bw()+xlab(candidate)+ylab(evidence)
             if (point) {p <- p + geom_point(wm,
-                mapping=aes(x=get(candidate), y=level), color="tomato",
+                mapping=aes_(x=candidate, y=~level), color="tomato",
                 size=pointSize) }
         }
         p 
@@ -433,8 +436,10 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
     # }
 
     res <- results@result
-    if (!is.null(qvalueCutOff)) { res <- subset(res, qvalue < qvalueCutOff) }
-    if (!is.null(adjpCutOff)) { res <- subset(res, p.adjust < adjpCutOff) }
+    if (!is.null(qvalueCutOff)) {
+        res <- subset(res, res$qvalue < qvalueCutOff) }
+    if (!is.null(adjpCutOff)) {
+        res <- subset(res, res$p.adjust < adjpCutOff) }
     if (nCategory) {
         res <- res[seq_len(nCategory),]
         res <- res[!is.na(res$ID),]

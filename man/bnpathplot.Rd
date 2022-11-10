@@ -52,15 +52,18 @@ bnpathplot(
 )
 }
 \arguments{
-\item{results}{the enrichment analysis result from clusterProfiler or ReactomePA}
+\item{results}{the enrichment analysis result}
 
 \item{exp}{gene expression matrix}
 
-\item{expSample}{candidate rows to be included in the inference, default to all}
+\item{expSample}{candidate rows to be included in the inference
+default to all}
 
-\item{algo}{structure learning method used in boot.strength(), default to "hc"}
+\item{algo}{structure learning method used in boot.strength()
+default to "hc"}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to 
+bnlearn structure learnng function}
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
@@ -102,11 +105,14 @@ bnpathplot(
 
 \item{disc}{discretize the expressoin data}
 
-\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+\item{tr}{Specify data.frame if one needs to discretize
+as the same parameters as the other dataset}
 
-\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+\item{remainCont}{Specify characters when perform discretization,
+if some columns are to be remain continuous}
 
-\item{shadowText}{whether to use shadow text for the better readability (default: TRUE)}
+\item{shadowText}{whether to use shadow text for the better readability
+(default: TRUE)}
 
 \item{bgColor}{color for text background when shadowText is TRUE}
 
@@ -122,15 +128,18 @@ bnpathplot(
 
 \item{scoreType}{score type to use on choosing edge direction}
 
-\item{databasePal}{palette to be used in scale_color_brewer, when the multiple results are to be shown}
+\item{databasePal}{palette to be used in scale_color_brewer
+when the multiple results are to be shown}
 
 \item{dep}{the tibble storing dependency score from library depmap}
 
 \item{sizeDep}{whether to reflect DepMap score to the node size}
 
-\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+\item{orgDb}{perform clusterProfiler::setReadable based on
+this organism database}
 
-\item{edgeLink}{whether to set edge to geom_edge_link(), FALSE to use geom_edge_diagonal()}
+\item{edgeLink}{whether to set edge to geom_edge_link()
+FALSE to use geom_edge_diagonal()}
 
 \item{cellLineName}{the cell line name to be included}
 
@@ -148,6 +157,7 @@ Plot pathway relationship
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bnpathplot(results = exampleEaRes, exp = exampleGeneExp, R = 10, expRow = "ENSEMBL")
+res <- bnpathplot(results = exampleEaRes, exp = exampleGeneExp,
+                  R = 10, expRow = "ENSEMBL")
 
 }
