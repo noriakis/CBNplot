@@ -67,6 +67,7 @@
 #' res <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1,
 #'                   R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
 #'
+#' @import oaqc
 #' @importFrom dplyr group_by summarize arrange n
 #' @importFrom graphite pathways convertIdentifiers pathwayGraph
 #' @importFrom clusterProfiler setReadable
@@ -510,8 +511,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                 intP <- ggraph(refPlot, layout=layout) + 
                     geom_edge_diagonal(edge_alpha=1,
                                     position="identity",
-                                    aes_(edge_colour=~I(color),
-                                        width=~I(width), label=~I(label)),
+                                    aes_(edge_colour=~color,
+                                        width=~width, label=~label),
                                     label_size=3*(labelSize/4),
                                     label_colour=NA,
                                     angle_calc = "along",
@@ -592,8 +593,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
             p <- ggraph(delG, layout="manual", x=xy[,1], y=xy[,2]) + 
                     geom_edge_diagonal(edge_alpha=1,
                                 position="identity",
-                                aes_(edge_colour=~I(color), width=~I(width),
-                                    label=~I(label)),
+                                aes_(edge_colour=~color, width=~width,
+                                    label=~label),
                                 label_size=3*(labelSize/4),
                                 label_colour=NA,
                                 angle_calc = "along",
