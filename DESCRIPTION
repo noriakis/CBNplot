@@ -7,11 +7,22 @@ Description: This package provides the visualization of bayesian network inferre
 License: Artistic-2.0
 Encoding: UTF-8
 Depends:
-    R (>= 4.0.0)
-Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn (>= 4.7), patchwork, org.Hs.eg.db, clusterProfiler, utils, enrichplot, reshape2, ggforce, dplyr, tidyr, stringr, depmap, ExperimentHub, Rmpfr, graphlayouts, BiocFileCache, ggdist, purrr, pvclust, rlang, stats
-Suggests: knitr, arules, concaveman, ReactomePA, bnviewer, DESeq2, GEOquery, rmarkdown, withr
-biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network
+    R (>= 3.5.0)
+Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn (>= 4.7), patchwork, org.Hs.eg.db, clusterProfiler, utils, enrichplot, reshape2, ggforce, dplyr, tidyr, stringr, depmap, ExperimentHub, Rmpfr, graphlayouts, BiocFileCache, ggdist, purrr, pvclust, stats, rlang
+Suggests: 
+    knitr,
+    arules,
+    concaveman,
+    ReactomePA,
+    bnviewer,
+    DESeq2,
+    GEOquery,
+    rmarkdown,
+    withr,
+    testthat (>= 3.0.0)
+biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network, NetworkEnrichment
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
 URL: https://github.com/noriakis/CBNplot
 BugReports: https://github.com/noriakis/CBNplot/issues
+Config/testthat/edition: 3
