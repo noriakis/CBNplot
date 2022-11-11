@@ -56,6 +56,9 @@
 #' @param onlyDf return only data.frame used for inference
 #' @param orgDb perform clusterProfiler::setReadable
 #'              based on this organism database
+#' @param bypassConverting bypass the symbol converting
+#'                         ID of rownames and those listed in EA result
+#'                         must be same
 #' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @examples 
 #' data("exampleEaRes");data("exampleGeneExp")
@@ -84,7 +87,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
                             barBackCol="white", scoreType="bic-g",
                             barLegendKeyCol="white", orgDb=org.Hs.eg.db,
                             barAxisCol="black", barPanelGridCol="black",
-                            seed = 1) {
+                            seed = 1, bypassConverting=FALSE) {
     # if (is.null(hub) ||
     # is.null(glowEdgeNum) ||
     # hub <= 0 || glowEdgeNum <= 0) {
@@ -108,8 +111,10 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
     } else if (attributes(results)$class[1]=="gseaResult"){
         typeOfOntology <- results@setType
     }
-    if (!is.null(orgDb)){
-        results <- setReadable(results, OrgDb = orgDb)
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb = orgDb)
+        }
     }
 
     tmpCol <- colnames(results@result)
@@ -152,11 +157,13 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
                 -1 * mean((filteredDep %>%
                     filter(.data$gene_name %in% genesInPathway))$dependency))
         }
-        if (!is.null(orgDb)){
-            genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                    fromType="SYMBOL",
-                                                    toType=expRow,
-                                                    OrgDb=orgDb)[expRow][,1]
+        if (!bypassConverting) {
+            if (!is.null(orgDb)){
+                genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                        fromType="SYMBOL",
+                                                        toType=expRow,
+                                                        OrgDb=orgDb)[expRow][,1]
+            }
         }
         pathwayMatrix <- exp[ intersect(rownames(exp),
                                         genesInPathway), expSample ]

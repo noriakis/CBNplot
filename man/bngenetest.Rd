@@ -16,7 +16,8 @@ bngenetest(
   convertSymbol = TRUE,
   expRow = "ENSEMBL",
   scoreType = "aic-g",
-  orgDb = org.Hs.eg.db
+  orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ converted to symbol, default to TRUE}
 
 \item{orgDb}{perform clusterProfiler::setReadable
 based on this organism database}
+
+\item{bypassConverting}{bypass symbol converting}
 }
 \value{
 list of graphs and scores

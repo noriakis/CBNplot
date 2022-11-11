@@ -17,6 +17,9 @@
 #'                 ordered by p-value)
 #' @param convertSymbol whether the label of resulting network is 
 #'                      converted to symbol, default to TRUE
+#' @param bypassConverting bypass the symbol converting
+#'                         ID of rownames and those listed in EA result
+#'                         must be same
 #' @param interactive whether to use bnviewer (default to FALSE)
 #' @param cexCategory scaling factor of size of nodes
 #' @param delZeroDegree delete zero degree nodes
@@ -78,6 +81,7 @@
 
 bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                         returnNet=FALSE, algorithm.args=NULL,
+                        bypassConverting=FALSE,
                         pathNum=NULL, convertSymbol=TRUE, expRow="ENSEMBL",
                         interactive=FALSE, cexCategory=1, cl=NULL,
                         showDir=FALSE, chooseDir=FALSE, scoreType="bic-g",
@@ -115,8 +119,12 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    if (!is.null(orgDb)){
-        results <- setReadable(results, OrgDb=orgDb)
+
+    if (bypassConverting){convertSymbol <- FALSE}
+    if (!bypassConverting){
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb=orgDb)
+        }
     }
     tmpCol <- colnames(results@result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
@@ -154,37 +162,42 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
     res <- results@result
 
     genesInPathway <- unique(unlist(strsplit(res[pathNum, ]$geneID, "/")))
-    if (!is.null(orgDb)) {
-        genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb= orgDb )[expRow][,1]
+    if (!bypassConverting) {
+        if (!is.null(orgDb)) {
+            genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb= orgDb )[expRow][,1]
+        }
     }
+
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
-    if (expRow!="SYMBOL"){
-        if (convertSymbol && !is.null(orgDb)) {
-            # rn <- clusterProfiler::bitr(rownames(pcs),
-            #                             fromType=expRow,
-            #                             toType="SYMBOL",
-            #                             OrgDb=org.Hs.eg.db)["SYMBOL"][,1]
-            ## Change expression matrix rownames to symbol
-            ## If one "expRow" hit to multiple symbols,
-            ## delete the ID from the subsequent analysis, showing warning.
-            matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
-                                                toType="SYMBOL", OrgDb=orgDb)
-            if (sum(duplicated(matchTable[,1])) >= 1) {
-                message("Removing IDs that matches the multiple symbols")
-                matchTable <- matchTable[
-                    !matchTable[,1] %in% matchTable[,1][
-                        duplicated(matchTable[,1])
-                    ],
-                ]
+    if (!bypassConverting) {
+        if (expRow!="SYMBOL"){
+            if (convertSymbol && !is.null(orgDb)) {
+                # rn <- clusterProfiler::bitr(rownames(pcs),
+                #                             fromType=expRow,
+                #                             toType="SYMBOL",
+                #                             OrgDb=org.Hs.eg.db)["SYMBOL"][,1]
+                ## Change expression matrix rownames to symbol
+                ## If one "expRow" hit to multiple symbols,
+                ## delete the ID from the subsequent analysis, showing warning.
+                matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
+                                                    toType="SYMBOL", OrgDb=orgDb)
+                if (sum(duplicated(matchTable[,1])) >= 1) {
+                    message("Removing IDs that matches the multiple symbols")
+                    matchTable <- matchTable[
+                        !matchTable[,1] %in% matchTable[,1][
+                            duplicated(matchTable[,1])
+                        ],
+                    ]
+                }
+                rnSym <- matchTable["SYMBOL"][,1]
+                rnExp <- matchTable[expRow][,1]
+                pcs <- pcs[rnExp, ]
+                rownames(pcs) <- rnSym
             }
-            rnSym <- matchTable["SYMBOL"][,1]
-            rnExp <- matchTable[expRow][,1]
-            pcs <- pcs[rnExp, ]
-            rownames(pcs) <- rnSym
         }
     }
 
@@ -225,10 +238,14 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
 
         } else {
             if (!is.null(orgDb)){
-                m <- clusterProfiler::bitr(clus$geneID,
-                                            fromType="SYMBOL",
-                                            toType=expRow,
-                                            OrgDb=orgDb)
+                if (bypassConverting) {
+                    m <- cbind(clus$geneID, clus$geneID)
+                } else {
+                    m <- clusterProfiler::bitr(clus$geneID,
+                                                fromType="SYMBOL",
+                                                toType=expRow,
+                                                OrgDb=orgDb)
+                }
                 colnames(m) <- c("geneID", expRow)
                 mcl <- merge(m, clus)
                 cnt <- mcl %>% group_by_at(expRow) %>%

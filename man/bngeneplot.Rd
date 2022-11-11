@@ -12,6 +12,7 @@ bngeneplot(
   R = 20,
   returnNet = FALSE,
   algorithm.args = NULL,
+  bypassConverting = FALSE,
   pathNum = NULL,
   convertSymbol = TRUE,
   expRow = "ENSEMBL",
@@ -70,6 +71,10 @@ default to "hc"}
 
 \item{algorithm.args}{parameters to pass to bnlearn
 structure learnng function}
+
+\item{bypassConverting}{bypass the symbol converting
+ID of rownames and those listed in EA result
+must be same}
 
 \item{pathNum}{the pathway number
 (the number of row of the original result,

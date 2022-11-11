@@ -13,6 +13,7 @@ bnpathtest(
   expRow = "ENSEMBL",
   cl = NULL,
   orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE,
   qvalueCutOff = 0.05,
   adjpCutOff = 0.05,
   nCategory = 15,
@@ -40,6 +41,8 @@ bnlearn structure learnng function}
 
 \item{orgDb}{perform clusterProfiler::setReadable
 based on this organism database}
+
+\item{bypassConverting}{bypass symbol converting}
 
 \item{qvalueCutOff}{the cutoff value for qvalue}
 

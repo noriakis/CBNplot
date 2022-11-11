@@ -50,6 +50,9 @@
 #'                    when the multiple results are to be shown
 #' @param orgDb perform clusterProfiler::setReadable based on
 #'              this organism database
+#' @param bypassConverting bypass the symbol converting
+#'                         ID of rownames and those listed in EA result
+#'                         must be same
 #' @param shadowText whether to use shadow text for the better readability
 #'                   (default: TRUE)
 #' @param bgColor color for text background when shadowText is TRUE
@@ -85,6 +88,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
                     compareRef=FALSE, strThresh=NULL, strType="normal",
                     hub=NULL, scoreType="bic-g", databasePal="Set2",
                     dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db,
+                    bypassConverting=FALSE,
                     edgeLink=TRUE, cellLineName="5637_URINARY_TRACT",
                     strengthPlot=FALSE, nStrength=10, seed = 1)
 {
@@ -97,8 +101,10 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
             } else if (attributes(results[[i]])$class[1]=="gseaResult"){
                 typeOfOntologies[[i]] <- results[[i]]@setType
             }
-            if (!is.null(orgDb)){
-                results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
+            if (!bypassConverting) {
+                if (!is.null(orgDb)){
+                    results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
+                }
             }
         }
     } else {
@@ -107,8 +113,10 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
         } else if (attributes(results)$class[1]=="gseaResult"){
             typeOfOntology <- results@setType
         }
-        if (!is.null(orgDb)){
-            results <- setReadable(results, OrgDb = orgDb)
+        if (!bypassConverting) {
+            if (!is.null(orgDb)){
+                results <- setReadable(results, OrgDb = orgDb)
+            }
         }
     }
 
@@ -238,11 +246,13 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
                 -1 * mean((filteredDep %>%
                     filter(.data$gene_name %in% genesInPathway))$dependency))
         }
-        if (!is.null(orgDb)){
-            genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                    fromType="SYMBOL",
-                                                    toType=expRow,
-                                                    OrgDb=orgDb)[expRow][,1]
+        if (!bypassConverting) {
+            if (!is.null(orgDb)){
+                genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                        fromType="SYMBOL",
+                                                        toType=expRow,
+                                                        OrgDb=orgDb)[expRow][,1]
+            }
         }
         pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway),
                             expSample ]

@@ -411,6 +411,7 @@ compareBNs <- function(listOfNets){
 #' @param scoreType return the specified scores
 #' @param orgDb perform clusterProfiler::setReadable
 #'              based on this organism database
+#' @param bypassConverting bypass symbol converting
 #' @return list of graphs and scores
 #' @examples
 #' data("exampleEaRes");data("exampleGeneExp")
@@ -421,12 +422,14 @@ compareBNs <- function(listOfNets){
 #'
 bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
                         algorithm.args=NULL, expRow="ENSEMBL", cl=NULL,
-                        orgDb=org.Hs.eg.db,
+                        orgDb=org.Hs.eg.db, bypassConverting=FALSE,
                         qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15,
                         Rrange=seq(2,40,2), scoreType="aic-g")
 {
-    if (!is.null(orgDb)){
-        results <- clusterProfiler::setReadable(results, OrgDb=orgDb)
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            results <- clusterProfiler::setReadable(results, OrgDb=orgDb)
+        }
     }
     if (is.null(expSample)) {expSample <- colnames(exp)}
     # if (results@keytype == "kegg"){
@@ -450,11 +453,13 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
     pwayNames <- c()
     for (i in seq_len(length(rownames(res)))) {
         genesInPathway <- strsplit(res[i, ]$geneID, "/")[[1]]
-        if (!is.null(orgDb)){
-            genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                    fromType="SYMBOL",
-                                                    toType=expRow,
-                                                    OrgDb=orgDb)[expRow][,1]
+        if (!bypassConverting) {
+            if (!is.null(orgDb)){
+                genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                        fromType="SYMBOL",
+                                                        toType=expRow,
+                                                        OrgDb=orgDb)[expRow][,1]
+            }
         }
         pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway),
                             expSample ]
@@ -526,6 +531,7 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
 #'                                    ordered by p-value)
 #' @param orgDb perform clusterProfiler::setReadable
 #'              based on this organism database
+#' @param bypassConverting bypass symbol converting
 #'
 #' @return list of graphs and scores
 #' @examples
@@ -537,26 +543,31 @@ bnpathtest <- function (results, exp, expSample=NULL, algo="hc",
 bngenetest <- function (results, exp, expSample=NULL, algo="hc",
                         Rrange=seq(2,40,2), cl=NULL, algorithm.args=NULL,
                         pathNum=NULL, convertSymbol=TRUE, expRow="ENSEMBL",
-                        scoreType="aic-g", orgDb=org.Hs.eg.db)
+                        scoreType="aic-g", orgDb=org.Hs.eg.db,
+                        bypassConverting=FALSE)
 {
+    if (bypassConverting) {convertSymbol <- FALSE}
     # if (results@keytype == "kegg"){
     #     resultsGeneType <- "ENTREZID"
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    if (!is.null(orgDb)){
-        results <- setReadable(results, OrgDb=orgDb)
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb=orgDb)
+        }
     }
     if (is.null(expSample)) {expSample <- colnames(exp)}
     res <- results@result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
-
-    if (!is.null(orgDb)){
-        genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb=orgDb)[expRow][,1]
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb=orgDb)[expRow][,1]
+        }
     }
 
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]

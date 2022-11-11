@@ -19,6 +19,9 @@
 #'                (the number of row of the original result, ordered by p-value)
 #' @param convertSymbol whether the label of resulting network is
 #'                      converted to symbol, default to TRUE
+#' @param bypassConverting bypass the symbol converting
+#'                         ID of rownames and those listed in EA result
+#'                         must be same
 #' @param cexCategory scaling factor of size of nodes
 #' @param cl cluster object from parallel::makeCluster()
 #' @param showDir show the confidence of direction of edges
@@ -77,6 +80,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
                             returnNet=FALSE, otherVar=NULL, otherVarName=NULL,
                             onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                             dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db,
+                            bypassConverting=FALSE,
                             cellLineName="5637_URINARY_TRACT",
                             fontFamily="sans", strengthPlot=FALSE,
                             nStrength=10, strThresh=NULL, hub=NULL,
@@ -102,8 +106,10 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    if (!is.null(orgDb)){
-        results <- setReadable(results, OrgDb=orgDb)
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb=orgDb)
+        }
     }
     tmpCol <- colnames(results@result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
@@ -133,26 +139,31 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     res <- results@result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
-    if (!is.null(orgDb)){
-        genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb=orgDb)[expRow][,1]
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                    fromType="SYMBOL",
+                                                    toType=expRow,
+                                                    OrgDb=orgDb)[expRow][,1]
+        }
     }
+
     pcs <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
 
-    if (convertSymbol && !is.null(orgDb)) {
-    matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
-        toType="SYMBOL", OrgDb=orgDb)
-    if (sum(duplicated(matchTable[,1])) >= 1) {
-        message("Removing expRow that matches the multiple symbols")
-        matchTable <- matchTable[
-        !matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
-    }
-        rnSym <- matchTable["SYMBOL"][,1]
-        rnExp <- matchTable[expRow][,1]
-        pcs <- pcs[rnExp, ]
-        rownames(pcs) <- rnSym
+    if (!bypassConverting) {
+        if (convertSymbol && !is.null(orgDb)) {
+        matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
+            toType="SYMBOL", OrgDb=orgDb)
+        if (sum(duplicated(matchTable[,1])) >= 1) {
+            message("Removing expRow that matches the multiple symbols")
+            matchTable <- matchTable[
+            !matchTable[,1] %in% matchTable[,1][duplicated(matchTable[,1])],]
+        }
+            rnSym <- matchTable["SYMBOL"][,1]
+            rnExp <- matchTable[expRow][,1]
+            pcs <- pcs[rnExp, ]
+            rownames(pcs) <- rnSym
+        }
     }
 
     pcs <- data.frame(t(pcs))

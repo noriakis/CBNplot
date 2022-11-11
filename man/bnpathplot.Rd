@@ -44,6 +44,7 @@ bnpathplot(
   dep = NULL,
   sizeDep = FALSE,
   orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE,
   edgeLink = TRUE,
   cellLineName = "5637_URINARY_TRACT",
   strengthPlot = FALSE,
@@ -137,6 +138,10 @@ when the multiple results are to be shown}
 
 \item{orgDb}{perform clusterProfiler::setReadable based on
 this organism database}
+
+\item{bypassConverting}{bypass the symbol converting
+ID of rownames and those listed in EA result
+must be same}
 
 \item{edgeLink}{whether to set edge to geom_edge_link()
 FALSE to use geom_edge_diagonal()}

@@ -32,6 +32,7 @@ bngeneplotCustom(
   dep = NULL,
   sizeDep = FALSE,
   orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE,
   cellLineName = "5637_URINARY_TRACT",
   fontFamily = "sans",
   strengthPlot = FALSE,
@@ -117,6 +118,10 @@ if some columns are to be remain continuous}
 
 \item{orgDb}{perform clusterProfiler::setReadable
 based on this organism database}
+
+\item{bypassConverting}{bypass the symbol converting
+ID of rownames and those listed in EA result
+must be same}
 
 \item{cellLineName}{the cell line name to be included}
 

@@ -53,7 +53,8 @@ bnpathplotCustom(
   orgDb = org.Hs.eg.db,
   barAxisCol = "black",
   barPanelGridCol = "black",
-  seed = 1
+  seed = 1,
+  bypassConverting = FALSE
 )
 }
 \arguments{
@@ -160,6 +161,10 @@ based on this organism database}
 \item{barPanelGridCol}{panel grid color in barplot}
 
 \item{seed}{A random seed to make the analysis reproducible, default is 1.}
+
+\item{bypassConverting}{bypass the symbol converting
+ID of rownames and those listed in EA result
+must be same}
 }
 \value{
 ggplot2 object
