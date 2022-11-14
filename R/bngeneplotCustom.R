@@ -99,6 +99,11 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
         stop("Please specify number(s) for pathNum.")}
     if (is.null(expSample)) {
         expSample <- colnames(exp)}
+
+    ## The newer version of reactome.db
+    results@result$Description <- gsub("Homo sapiens\r: ",
+                                    "",
+                                    results@result$Description)
     
     ## Deprecated
     # if (results@keytype == "kegg"){

@@ -105,7 +105,9 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-
+    results@result$Description <- gsub("Homo sapiens\r: ",
+                                    "",
+                                    results@result$Description)
     if (attributes(results)$class[1]=="enrichResult"){
         typeOfOntology <- results@ontology
     } else if (attributes(results)$class[1]=="gseaResult"){

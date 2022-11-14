@@ -126,6 +126,10 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
             results <- setReadable(results, OrgDb=orgDb)
         }
     }
+    ## The newer version of reactome.db
+    results@result$Description <- gsub("Homo sapiens\r: ",
+                                    "",
+                                    results@result$Description)
     tmpCol <- colnames(results@result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"

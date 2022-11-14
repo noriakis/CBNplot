@@ -101,6 +101,10 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
             } else if (attributes(results[[i]])$class[1]=="gseaResult"){
                 typeOfOntologies[[i]] <- results[[i]]@setType
             }
+            ## The newer version of reactome.db
+            results[[i]]@result$Description <- gsub("Homo sapiens\r: ",
+                                    "",
+                                    results[[i]]@result$Description)
             if (!bypassConverting) {
                 if (!is.null(orgDb)){
                     results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
@@ -108,6 +112,9 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
             }
         }
     } else {
+        results@result$Description <- gsub("Homo sapiens\r: ",
+                                "",
+                                results@result$Description)
         if (attributes(results)$class[1]=="enrichResult"){
             typeOfOntology <- results@ontology
         } else if (attributes(results)$class[1]=="gseaResult"){
