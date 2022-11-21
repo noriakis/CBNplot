@@ -309,9 +309,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
     } else {
         prefix <- gsub("\\.","",format(Sys.time(), "%Y%m%d%H%M%OS3"))
         tmpPath <- paste0(prefix,"tmpmat.txt")
-        write.table(t(pcs), tmpPath, quote=F, row.names=T, col.names=F, sep="\t")
-        # pathOnWSL <- tolower(paste0("/mnt/host/",gsub(":","",tmpPath)))
-        # ?bngeneplot
+        write.table(t(pcs), tmpPath, quote=FALSE,
+            row.names=TRUE, col.names=FALSE, sep="\t")
         system(paste0('bash -c "signbn.1.8.3 --total-mem 1000 -N ',R,' -o ',
                       prefix,'_net.txt ',
                       tmpPath, '"'))
