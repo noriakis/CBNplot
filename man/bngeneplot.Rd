@@ -51,7 +51,8 @@ bngeneplot(
   nStrength = 10,
   strThresh = NULL,
   hub = NULL,
-  seed = 1
+  seed = 1,
+  useSiGN = FALSE
 )
 }
 \arguments{
@@ -162,6 +163,11 @@ default: TRUE}
 \item{hub}{visualize the genes with top-n hub scores}
 
 \item{seed}{A random seed to make the analysis reproducible, default is 1.}
+
+\item{useSiGN}{default to FALSE.
+For using SiGN-BN in the function in Windows 10/11,
+1. Download the SiGN-BN HC+BS binary in WSL (https://sign.hgc.jp/signbn/download.html)
+2. Set PATH to executable (sign.1.8.3)}
 }
 \value{
 ggplot2 object

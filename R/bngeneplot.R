@@ -1,6 +1,7 @@
 #' bngeneplot
 #'
 #' Plot gene relationship within the specified pathway
+#' 
 #'
 #' @param results the enrichment analysis result
 #' @param exp gene expression matrix
@@ -63,6 +64,10 @@
 #' @param bgColor color for text background when shadowText is TRUE
 #' @param textColor color for text when shadowText is TRUE
 #' @param seed A random seed to make the analysis reproducible, default is 1.
+#' @param useSiGN default to FALSE.
+#' For using SiGN-BN in the function in Windows 10/11,
+#' 1. Download the SiGN-BN HC+BS binary in WSL (https://sign.hgc.jp/signbn/download.html)
+#' 2. Set PATH to executable (sign.1.8.3)
 #' @return ggplot2 object
 #'
 #' @examples
@@ -96,7 +101,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                         showLineage=FALSE, orgDb=org.Hs.eg.db, shadowText=TRUE,
                         bgColor="white", textColor="black",
                         strengthPlot=FALSE, nStrength=10, strThresh=NULL,
-                        hub=NULL, seed = 1) {
+                        hub=NULL, seed = 1, useSiGN=FALSE) {
     
     if (is.null(expSample)) {expSample <- colnames(exp)}
     if (compareRef & length(pathNum) > 1){
@@ -292,13 +297,27 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
         message("the number of gene is zero or one");return("error")}
 
     ## Bootstrap-based inference
-    if (strType == "normal"){
-        strength <- withr::with_seed(seed = seed,
-            boot.strength(pcs, algorithm=algo,
-                algorithm.args=algorithm.args, R=R, cluster=cl))
-    } else if (strType == "ms"){
-        strength <- withr::with_seed(seed = seed,
-            inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
+    if (!useSiGN){
+        if (strType == "normal"){
+            strength <- withr::with_seed(seed = seed,
+                boot.strength(pcs, algorithm=algo,
+                    algorithm.args=algorithm.args, R=R, cluster=cl))
+        } else if (strType == "ms"){
+            strength <- withr::with_seed(seed = seed,
+                inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
+        }
+    } else {
+        prefix <- gsub("\\.","",format(Sys.time(), "%Y%m%d%H%M%OS3"))
+        tmpPath <- paste0(prefix,"tmpmat.txt")
+        write.table(t(pcs), tmpPath, quote=F, row.names=T, col.names=F, sep="\t")
+        # pathOnWSL <- tolower(paste0("/mnt/host/",gsub(":","",tmpPath)))
+        # ?bngeneplot
+        system(paste0('bash -c "signbn.1.8.3 --total-mem 1000 -N ',R,' -o ',
+                      prefix,'_net.txt ',
+                      tmpPath, '"'))
+        unlink(tmpPath)
+        net <- loadSign(paste0(prefix,'_net.txt'))
+        strength <- net$str
     }
 
     ## Barplot of edge strength
@@ -318,10 +337,14 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
     }
 
     ## Average by specified threshold
-    if (!is.null(strThresh)){
-        av <- averaged.network(strength, threshold=strThresh)
+    if (!useSiGN) {
+        if (!is.null(strThresh)){
+            av <- averaged.network(strength, threshold=strThresh)
+        } else {
+            av <- averaged.network(strength)
+        }
     } else {
-        av <- averaged.network(strength)
+        av <- net$av
     }
 
     # if (chooseDir){
