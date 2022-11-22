@@ -630,8 +630,10 @@ bngenetest <- function (results, exp, expSample=NULL, algo="hc",
 loadSign <- function(fileName){
     returnList <- list()
     rawStr <- readChar(fileName, file.info(fileName)$size)
-    edges <- read.csv(text=unlist(strsplit(rawStr, "\\[Edges]\n"))[2], sep="\t", header=F)
-    nodes <- read.csv(text=unlist(strsplit(unlist(strsplit(rawStr, "\\[Edges]\n"))[1], "\\[Nodes]\n"))[2], sep="\t", header=F)
+    edges <- read.csv(text=unlist(strsplit(rawStr, "\\[Edges]\n"))[2],
+        sep="\t", header=FALSE)
+    nodes <- read.csv(text=unlist(strsplit(unlist(strsplit(rawStr, "\\[Edges]\n"))[1],
+        "\\[Nodes]\n"))[2], sep="\t", header=FALSE)
     
     changeName <- list()
     for (i in seq_len(dim(nodes)[1])){
@@ -644,7 +646,7 @@ loadSign <- function(fileName){
     signStr <- edges[,1:3]
     colnames(signStr) <- c("from","to","strength")
     attr(signStr, "nodes") <- unique(c(signStr$from, signStr$to))
-    signStr = structure(signStr, method = "bootstrap", threshold = 0, class = c("bn.strength", class(signStr)))
+    signStr <- structure(signStr, method = "bootstrap", threshold = 0, class = c("bn.strength", class(signStr)))
     signBn <- averaged.network(signStr, threshold=bnlearn::inclusion.threshold(signStr))
     
     returnList[["str"]] <- signStr

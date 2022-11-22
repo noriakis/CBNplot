@@ -58,6 +58,10 @@
 #' @param bgColor color for text background when shadowText is TRUE
 #' @param textColor color for text when shadowText is TRUE
 #' @param seed A random seed to make the analysis reproducible, default is 1.
+#' @param useSiGN default to FALSE.
+#' For using SiGN-BN in the function in Windows 10/11,
+#' 1. Download the SiGN-BN HC+BS binary in WSL (https://sign.hgc.jp/signbn/download.html)
+#' 2. Set PATH to executable (sign.1.8.3)
 #' @return ggplot2 object
 #'
 #' @import ggraph ggplot2 patchwork igraph org.Hs.eg.db
@@ -88,7 +92,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
                     compareRef=FALSE, strThresh=NULL, strType="normal",
                     hub=NULL, scoreType="bic-g", databasePal="Set2",
                     dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db,
-                    bypassConverting=FALSE,
+                    bypassConverting=FALSE, useSiGN=FALSE,
                     edgeLink=TRUE, cellLineName="5637_URINARY_TRACT",
                     strengthPlot=FALSE, nStrength=10, seed = 1)
 {
@@ -302,13 +306,25 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
     if (onlyDf){
         return(pcs)
     }
-
-    if (strType == "normal"){
-        strength <- withr::with_seed(seed = seed ,boot.strength(pcs,
-            algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
-    } else if (strType == "ms"){
-        strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo,
-            algorithm.args=algorithm.args, R=R, cl=cl))
+    if (!useSiGN){
+        if (strType == "normal"){
+            strength <- withr::with_seed(seed = seed ,boot.strength(pcs,
+                algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
+        } else if (strType == "ms"){
+            strength <- withr::with_seed(seed = seed, inferMS(pcs, algo=algo,
+                algorithm.args=algorithm.args, R=R, cl=cl))
+        }
+    } else {
+        prefix <- gsub("\\.","",format(Sys.time(), "%Y%m%d%H%M%OS3"))
+        tmpPath <- paste0(prefix,"tmpmat.txt")
+        write.table(t(pcs), tmpPath, quote=FALSE,
+            row.names=TRUE, col.names=FALSE, sep="\t")
+        system(paste0('bash -c "signbn.1.8.3 --total-mem 1000 -N ',R,' -o ',
+                      prefix,'_net.txt ',
+                      tmpPath, '"'))
+        unlink(tmpPath)
+        net <- loadSign(paste0(prefix,'_net.txt'))
+        strength <- net$str
     }
 
     
@@ -328,12 +344,16 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
     }
 
     if (dim(strength)[1]==0) {return("error")}
-    if (!is.null(strThresh)){
-        av <- averaged.network(strength, threshold=strThresh)
+    ## Average by specified threshold
+    if (!useSiGN) {
+        if (!is.null(strThresh)){
+            av <- averaged.network(strength, threshold=strThresh)
+        } else {
+            av <- averaged.network(strength)
+        }
     } else {
-        av <- averaged.network(strength)
+        av <- net$av
     }
-
     # if (chooseDir){
     #   av <- chooseEdgeDir(av, pcs, scoreType)
     # }

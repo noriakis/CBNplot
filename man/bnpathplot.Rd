@@ -45,6 +45,7 @@ bnpathplot(
   sizeDep = FALSE,
   orgDb = org.Hs.eg.db,
   bypassConverting = FALSE,
+  useSiGN = FALSE,
   edgeLink = TRUE,
   cellLineName = "5637_URINARY_TRACT",
   strengthPlot = FALSE,
@@ -142,6 +143,11 @@ this organism database}
 \item{bypassConverting}{bypass the symbol converting
 ID of rownames and those listed in EA result
 must be same}
+
+\item{useSiGN}{default to FALSE.
+For using SiGN-BN in the function in Windows 10/11,
+1. Download the SiGN-BN HC+BS binary in WSL (https://sign.hgc.jp/signbn/download.html)
+2. Set PATH to executable (sign.1.8.3)}
 
 \item{edgeLink}{whether to set edge to geom_edge_link()
 FALSE to use geom_edge_diagonal()}
