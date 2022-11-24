@@ -51,8 +51,10 @@
 #' @param orgDb perform clusterProfiler::setReadable based on
 #'              this organism database
 #' @param bypassConverting bypass the symbol converting
+#'                         If you use custom annotation databases that 
+#'                         does not have SYMBOL listed in keys.
 #'                         ID of rownames and those listed in EA result
-#'                         must be same
+#'                         must be same.
 #' @param shadowText whether to use shadow text for the better readability
 #'                   (default: TRUE)
 #' @param bgColor color for text background when shadowText is TRUE

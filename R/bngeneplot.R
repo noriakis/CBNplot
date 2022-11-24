@@ -19,8 +19,10 @@
 #' @param convertSymbol whether the label of resulting network is 
 #'                      converted to symbol, default to TRUE
 #' @param bypassConverting bypass the symbol converting
+#'                         If you use custom annotation databases that 
+#'                         does not have SYMBOL listed in keys.
 #'                         ID of rownames and those listed in EA result
-#'                         must be same
+#'                         must be same.
 #' @param interactive whether to use bnviewer (default to FALSE)
 #' @param cexCategory scaling factor of size of nodes
 #' @param delZeroDegree delete zero degree nodes

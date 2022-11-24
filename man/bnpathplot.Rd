@@ -141,8 +141,10 @@ when the multiple results are to be shown}
 this organism database}
 
 \item{bypassConverting}{bypass the symbol converting
+If you use custom annotation databases that 
+does not have SYMBOL listed in keys.
 ID of rownames and those listed in EA result
-must be same}
+must be same.}
 
 \item{useSiGN}{default to FALSE.
 For using SiGN-BN in the function in Windows 10/11,

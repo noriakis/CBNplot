@@ -74,8 +74,10 @@ default to "hc"}
 structure learnng function}
 
 \item{bypassConverting}{bypass the symbol converting
+If you use custom annotation databases that 
+does not have SYMBOL listed in keys.
 ID of rownames and those listed in EA result
-must be same}
+must be same.}
 
 \item{pathNum}{the pathway number
 (the number of row of the original result,
