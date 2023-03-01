@@ -20,7 +20,7 @@ Suggests:
     rmarkdown,
     withr,
     testthat (>= 3.0.0)
-biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network, NetworkEnrichment
+biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network, NetworkEnrichment, GeneSetEnrichment
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 URL: https://github.com/noriakis/CBNplot
