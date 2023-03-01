@@ -68,7 +68,8 @@
 #' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @param useSiGN default to FALSE.
 #' For using SiGN-BN in the function in Windows 10/11,
-#' 1. Download the SiGN-BN HC+BS binary in WSL (https://sign.hgc.jp/signbn/download.html)
+#' 1. Download the SiGN-BN HC+BS binary in WSL
+#' (https://sign.hgc.jp/signbn/download.html)
 #' 2. Set PATH to executable (sign.1.8.3)
 #' @return ggplot2 object
 #'
@@ -195,8 +196,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                 ## Change expression matrix rownames to symbol
                 ## If one "expRow" hit to multiple symbols,
                 ## delete the ID from the subsequent analysis, showing warning.
-                matchTable <- clusterProfiler::bitr(rownames(pcs), fromType=expRow,
-                                                    toType="SYMBOL", OrgDb=orgDb)
+                matchTable <- clusterProfiler::bitr(rownames(pcs),
+                    fromType=expRow, toType="SYMBOL", OrgDb=orgDb)
                 if (sum(duplicated(matchTable[,1])) >= 1) {
                     message("Removing IDs that matches the multiple symbols")
                     matchTable <- matchTable[
@@ -241,7 +242,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
             colnames(mcl) <- c("SYMBOL","Pathway")
             cnt <- mcl %>% group_by(.data$SYMBOL) %>%
                 arrange(.data$Pathway, .by_group = TRUE) %>%
-                summarize(n=n(), Pathway=paste0(.data$Pathway, collapse = " + "))
+                summarize(n=n(), Pathway=paste0(.data$Pathway,
+                    collapse = " + "))
             ovl <- cnt[cnt$n > 1,]
             mclSub <- subset(mcl, mcl$SYMBOL %in% cnt[cnt$n==1,]$SYMBOL)
             cls <- rbind(mclSub[,c("SYMBOL","Pathway")],
@@ -262,7 +264,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                 mcl <- merge(m, clus)
                 cnt <- mcl %>% group_by_at(expRow) %>%
                     arrange(.data$Pathway, .by_group = TRUE) %>%
-                    summarize(n=n(), Pathway=paste0(.data$Pathway, collapse = " + "))
+                    summarize(n=n(), Pathway=paste0(.data$Pathway,
+                        collapse = " + "))
                 ovl <- cnt[cnt$n > 1,]
                 mclSub <- subset(mcl,
                     mcl[expRow][,1] %in% as.character(
@@ -307,7 +310,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                     algorithm.args=algorithm.args, R=R, cluster=cl))
         } else if (strType == "ms"){
             strength <- withr::with_seed(seed = seed,
-                inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
+                inferMS(pcs, algo=algo, algorithm.args=algorithm.args,
+                    R=R, cl=cl))
         }
     } else {
         prefix <- gsub("\\.","",format(Sys.time(), "%Y%m%d%H%M%OS3"))
@@ -315,8 +319,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
         write.table(t(pcs), tmpPath, quote=FALSE,
             row.names=TRUE, col.names=FALSE, sep="\t")
         system(paste0('bash -c "signbn.1.8.3 --total-mem 1000 -N ',R,' -o ',
-                      prefix,'_net.txt ',
-                      tmpPath, '"'))
+                    prefix,'_net.txt ',
+                    tmpPath, '"'))
         unlink(tmpPath)
         net <- loadSign(paste0(prefix,'_net.txt'))
         strength <- net$str

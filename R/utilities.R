@@ -632,7 +632,8 @@ loadSign <- function(fileName){
     rawStr <- readChar(fileName, file.info(fileName)$size)
     edges <- read.csv(text=unlist(strsplit(rawStr, "\\[Edges]\n"))[2],
         sep="\t", header=FALSE)
-    nodes <- read.csv(text=unlist(strsplit(unlist(strsplit(rawStr, "\\[Edges]\n"))[1],
+    nodes <- read.csv(text=unlist(strsplit(unlist(strsplit(rawStr,
+        "\\[Edges]\n"))[1],
         "\\[Nodes]\n"))[2], sep="\t", header=FALSE)
     
     changeName <- list()
@@ -640,14 +641,18 @@ loadSign <- function(fileName){
         changeName[[as.character(nodes[i,]$V3)]] <- nodes[i,]$V1
     }
     
-    edges$V1 <- sapply(edges$V1, function(x) changeName[[as.character(x)]])
-    edges$V2 <- sapply(edges$V2, function(x) changeName[[as.character(x)]])
+    edges$V1 <- vapply(edges$V1, function(x) changeName[[as.character(x)]],
+                    FUN.VALUE = "character")
+    edges$V2 <- vapply(edges$V2, function(x) changeName[[as.character(x)]],
+                    FUN.VALUE = "character")
     
-    signStr <- edges[,c(1:3,6)]
+    signStr <- edges[,c(1,2,3,6)]
     colnames(signStr) <- c("from","to","strength","direction")
     attr(signStr, "nodes") <- unique(c(signStr$from, signStr$to))
-    signStr <- structure(signStr, method = "bootstrap", threshold = 0, class = c("bn.strength", class(signStr)))
-    signBn <- averaged.network(signStr, threshold=bnlearn::inclusion.threshold(signStr))
+    signStr <- structure(signStr, method = "bootstrap", threshold = 0,
+        class = c("bn.strength", class(signStr)))
+    signBn <- averaged.network(signStr,
+        threshold=bnlearn::inclusion.threshold(signStr))
     
     returnList[["str"]] <- signStr
     returnList[["edges"]] <- edges

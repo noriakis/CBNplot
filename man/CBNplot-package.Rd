@@ -24,7 +24,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Noriaki Sato \email{nori5030@kuhp.kyoto-u.ac.jp}
+\strong{Maintainer}: Noriaki Sato \email{nori@hgc.jp}
 
 }
 \keyword{internal}

@@ -62,7 +62,8 @@
 #' @param seed A random seed to make the analysis reproducible, default is 1.
 #' @param useSiGN default to FALSE.
 #' For using SiGN-BN in the function in Windows 10/11,
-#' 1. Download the SiGN-BN HC+BS binary in WSL (https://sign.hgc.jp/signbn/download.html)
+#' 1. Download the SiGN-BN HC+BS binary in WSL
+#' (https://sign.hgc.jp/signbn/download.html)
 #' 2. Set PATH to executable (sign.1.8.3)
 #' @return ggplot2 object
 #'
@@ -322,8 +323,8 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
         write.table(t(pcs), tmpPath, quote=FALSE,
             row.names=TRUE, col.names=FALSE, sep="\t")
         system(paste0('bash -c "signbn.1.8.3 --total-mem 1000 -N ',R,' -o ',
-                      prefix,'_net.txt ',
-                      tmpPath, '"'))
+                    prefix,'_net.txt ',
+                    tmpPath, '"'))
         unlink(tmpPath)
         net <- loadSign(paste0(prefix,'_net.txt'))
         strength <- net$str
