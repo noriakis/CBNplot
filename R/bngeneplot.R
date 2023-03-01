@@ -79,6 +79,7 @@
 #'
 #' @import oaqc
 #' @importFrom dplyr group_by summarize arrange n
+#' @importFrom utils write.table
 #' @importFrom graphite pathways convertIdentifiers pathwayGraph
 #' @importFrom clusterProfiler setReadable
 #' @importFrom rlang .data
