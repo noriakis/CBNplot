@@ -105,13 +105,13 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-    results@result$Description <- gsub("Homo sapiens\r: ",
+    attributes(results)$result$Description <- gsub("Homo sapiens\r: ",
                                     "",
-                                    results@result$Description)
+                                    attributes(results)$result$Description)
     if (attributes(results)$class[1]=="enrichResult"){
-        typeOfOntology <- results@ontology
+        typeOfOntology <- attributes(results)$ontology
     } else if (attributes(results)$class[1]=="gseaResult"){
-        typeOfOntology <- results@setType
+        typeOfOntology <- attributes(results)$setType
     }
     if (!bypassConverting) {
         if (!is.null(orgDb)){
@@ -119,15 +119,15 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
         }
     }
 
-    tmpCol <- colnames(results@result)
+    tmpCol <- colnames(attributes(results)$result)
     ## Make comparable
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
     tmpCol[tmpCol=="setSize"] <- "Count"
 
-    colnames(results@result) <- tmpCol
-    if (!"enrichmentScore" %in% colnames(results@result)){
-        results@result["enrichmentScore"] <- 0
+    colnames(attributes(results)$result) <- tmpCol
+    if (!"enrichmentScore" %in% colnames(attributes(results)$result)){
+        attributes(results)$result["enrichmentScore"] <- 0
     }
 
     if (sizeDep) {
@@ -135,7 +135,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
         filteredDep <- dep %>% filter(.data$cell_line==cellLineName)
     }
 
-    res <- results@result
+    res <- attributes(results)$result
 
     pcs <- c()
     pwayNames <- c()
@@ -290,8 +290,8 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
 
     ## Edge width
     if (is.null(otherVar)) {
-        if (length(results@termsim) != 0) {
-            w <- results@termsim[ names(V(g)), names(V(g)) ]
+        if (length(attributes(results)$termsim) != 0) {
+            w <- attributes(results)$termsim[ names(V(g)), names(V(g)) ]
             wd <- reshape2::melt(w)
             wd <- wd[wd[,1] != wd[,2],]
             wd <- wd[!is.na(wd[,3]),]

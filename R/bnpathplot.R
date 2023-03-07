@@ -104,14 +104,15 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
         typeOfOntologies <- list()
         for (i in seq_len(length(results))){
             if (attributes(results[[i]])$class[1]=="enrichResult"){
-                typeOfOntologies[[i]] <- results[[i]]@ontology
+                typeOfOntologies[[i]] <- attributes(results[[i]])$ontology
             } else if (attributes(results[[i]])$class[1]=="gseaResult"){
-                typeOfOntologies[[i]] <- results[[i]]@setType
+                typeOfOntologies[[i]] <- attributes(results[[i]])$setType
             }
             ## The newer version of reactome.db
-            results[[i]]@result$Description <- gsub("Homo sapiens\r: ",
-                                    "",
-                                    results[[i]]@result$Description)
+            attributes(results[[i]])$result$Description <- gsub(
+                "Homo sapiens\r: ",
+                "",
+                attributes(results[[i]])$result$Description)
             if (!bypassConverting) {
                 if (!is.null(orgDb)){
                     results[[i]] <- setReadable(results[[i]], OrgDb = orgDb)
@@ -119,13 +120,13 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
             }
         }
     } else {
-        results@result$Description <- gsub("Homo sapiens\r: ",
+        attributes(results)$result$Description <- gsub("Homo sapiens\r: ",
                                 "",
-                                results@result$Description)
+                                attributes(results)$result$Description)
         if (attributes(results)$class[1]=="enrichResult"){
-            typeOfOntology <- results@ontology
+            typeOfOntology <- attributes(results)$ontology
         } else if (attributes(results)$class[1]=="gseaResult"){
-            typeOfOntology <- results@setType
+            typeOfOntology <- attributes(results)$setType
         }
         if (!bypassConverting) {
             if (!is.null(orgDb)){
@@ -136,26 +137,27 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
 
     if (length(results)>1){
         for (i in seq_len(length(results))){
-            tmpCol <- colnames(results[[i]]@result)
+            tmpCol <- colnames(attributes(results[[i]])$result)
             ## Make comparable
             tmpCol[tmpCol=="core_enrichment"] <- "geneID"
             tmpCol[tmpCol=="qvalues"] <- "qvalue"
             tmpCol[tmpCol=="setSize"] <- "Count"
-            colnames(results[[i]]@result) <- tmpCol
-            if (!"enrichmentScore" %in% colnames(results[[i]]@result)){
-                results[[i]]@result["enrichmentScore"] <- 0
+            colnames(results[[i]][["result"]]) <- tmpCol
+            if (!"enrichmentScore" %in% 
+                colnames(attributes(results[[i]])$result)){
+                results[[i]][["result"]]["enrichmentScore"] <- 0
             }
         }
     } else {
-        tmpCol <- colnames(results@result)
+        tmpCol <- colnames(attributes(results)$result)
         ## Make comparable
         tmpCol[tmpCol=="core_enrichment"] <- "geneID"
         tmpCol[tmpCol=="qvalues"] <- "qvalue"
         tmpCol[tmpCol=="setSize"] <- "Count"
 
-        colnames(results@result) <- tmpCol
-        if (!"enrichmentScore" %in% colnames(results@result)){
-            results@result["enrichmentScore"] <- 0
+        colnames(attributes(results)$result) <- tmpCol
+        if (!"enrichmentScore" %in% colnames(attributes(results)$result)){
+            attributes(results)$result["enrichmentScore"] <- 0
         }
     }
 
@@ -175,7 +177,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
     if (length(results)>1){
         nc <- list()
         for (i in seq_len(length(results))) {
-            for (p in results[[i]]@result$Description){
+            for (p in attributes(results[[i]])$result$Description){
                 nc[[p]] <- typeOfOntologies[[i]]
             }
         }
@@ -206,7 +208,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
     if (length(results)>1){
         res <- c()
         for (n in seq_len(length(results))) {
-            tmpres <- results[[n]]@result
+            tmpres <- attributes(results[[n]])$result
             ## cutoff for q-value and adjusted p-value is same for all data
             if (!is.null(qvalueCutOff)) { 
                 tmpres <- subset(tmpres, tmpres$qvalue < qvalueCutOff) }
@@ -224,7 +226,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
             res <- rbind(res, tmpres)
         }
     } else {
-            res <- results@result
+            res <- attributes(results)$result
             if (!is.null(qvalueCutOff)) {
                 res <- subset(res, res$qvalue < qvalueCutOff) }
             if (!is.null(adjpCutOff)) {
@@ -397,8 +399,8 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
         ## Edge width
         if (is.null(otherVar)) {
             if (length(results)==1) {
-                if (length(results@termsim) != 0) {
-                    w <- results@termsim[ names(V(g)), names(V(g)) ]
+                if (length(attributes(results)$termsim) != 0) {
+                    w <- attributes(results)$termsim[ names(V(g)), names(V(g)) ]
                     wd <- melt(w)
                     wd <- wd[wd[,1] != wd[,2],]
                     wd <- wd[!is.na(wd[,3]),]

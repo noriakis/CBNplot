@@ -101,9 +101,9 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
         expSample <- colnames(exp)}
 
     ## The newer version of reactome.db
-    results@result$Description <- gsub("Homo sapiens\r: ",
+    attributes(results)$result$Description <- gsub("Homo sapiens\r: ",
                                     "",
-                                    results@result$Description)
+                                    attributes(results)$result$Description)
     
     ## Deprecated
     # if (results@keytype == "kegg"){
@@ -116,11 +116,11 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
             results <- setReadable(results, OrgDb=orgDb)
         }
     }
-    tmpCol <- colnames(results@result)
+    tmpCol <- colnames(attributes(results)$result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
     tmpCol[tmpCol=="setSize"] <- "Count"
-    colnames(results@result) <- tmpCol
+    colnames(attributes(results)$result) <- tmpCol
 
     # if (showLineage) {
     #     if (is.null(dep)){dep = depmap::depmap_crispr()}
@@ -141,7 +141,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
         scaleSizeHigh <- 8
     }
 
-    res <- results@result
+    res <- attributes(results)$result
 
     genesInPathway <- unlist(strsplit(res[pathNum, ]$geneID, "/"))
     if (!bypassConverting) {

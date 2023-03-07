@@ -136,14 +136,14 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
         }
     }
     ## The newer version of reactome.db
-    results@result$Description <- gsub("Homo sapiens\r: ",
+    attributes(results)$result$Description <- gsub("Homo sapiens\r: ",
                                     "",
-                                    results@result$Description)
-    tmpCol <- colnames(results@result)
+                                    attributes(results)$result$Description)
+    tmpCol <- colnames(attributes(results)$result)
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
     tmpCol[tmpCol=="setSize"] <- "Count"
-    colnames(results@result) <- tmpCol
+    colnames(attributes(results)$result) <- tmpCol
 
     if (showLineage) {
         if (is.null(dep)){dep <- depmap::depmap_crispr()}
@@ -172,7 +172,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
         scaleSizeHigh <- 8
     }
 
-    res <- results@result
+    res <- attributes(results)$result
 
     genesInPathway <- unique(unlist(strsplit(res[pathNum, ]$geneID, "/")))
     if (!bypassConverting) {
@@ -594,8 +594,8 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                                 aes_(label=~stringr::str_wrap(name, width = 25)
                             ),
                         check_overlap=TRUE, repel=TRUE, size = labelSize,
-                        color = "white",
-                        bg.color = "black", segment.color="black",
+                        color = "black",
+                        bg.color = "white", segment.color="black",
                         bg.r = .15)
                 } else {
                     intP <- intP + geom_node_text(
