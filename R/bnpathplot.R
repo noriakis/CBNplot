@@ -142,10 +142,10 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
             tmpCol[tmpCol=="core_enrichment"] <- "geneID"
             tmpCol[tmpCol=="qvalues"] <- "qvalue"
             tmpCol[tmpCol=="setSize"] <- "Count"
-            colnames(results[[i]][["result"]]) <- tmpCol
+            colnames(attributes(results[[i]])$result) <- tmpCol
             if (!"enrichmentScore" %in% 
                 colnames(attributes(results[[i]])$result)){
-                results[[i]][["result"]]["enrichmentScore"] <- 0
+                attributes(results[[i]])$result["enrichmentScore"] <- 0
             }
         }
     } else {
@@ -161,7 +161,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
         }
     }
 
-    if (nCategory==0){stop("category must be > 0")}
+    if (any(nCategory==0)) {stop("category must be > 0")}
     if (is.null(expSample)) {expSample <- colnames(exp)}
     if (interactive & compareRef){
         stop("compareRef must be set to FALSE when use bnviewer.")}
