@@ -1,6 +1,9 @@
 ---
 title: "CBNplot"
-output: rmarkdown::html_vignette
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{CBNplot}
   %\VignetteEngine{knitr::rmarkdown}
@@ -50,7 +53,8 @@ vsted = assay(v)
 
 ## Define the input genes, and use clusterProfiler::bitr to convert the ID.
 sig = subset(res, padj<0.05)
-cand.entrez = clusterProfiler::bitr(rownames(sig), fromType="ENSEMBL", toType="ENTREZID", OrgDb=org.Hs.eg.db)$ENTREZID
+cand.entrez = clusterProfiler::bitr(rownames(sig),
+  fromType="ENSEMBL", toType="ENTREZID", OrgDb=org.Hs.eg.db)$ENTREZID
 
 ## Perform enrichment analysis
 pway = ReactomePA::enrichPathway(gene = cand.entrez)
@@ -61,14 +65,46 @@ incSample = rownames(subset(meta, Condition=="T"))
 ```
 ### The use of CBNplot
 
-Then use CBNplot. Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included.
+
+## bngeneplot
+
+Then use CBNplot. Basically, you need to supply the enrichment analysis result, normalized expression value and samples to be included. For `bngeneplot`, the pathway number in the `result` slot of enrichment analysis results must be given.
 
 ```{r usecase, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
-bngeneplot(results = pway,exp = vsted, expSample = incSample, pathNum = 15)
-bnpathplot(results = pway,exp = vsted, expSample = incSample, shadowText = TRUE)
-bnpathplotCustom(results = pway, exp = vsted, expSample = incSample, fontFamily="sans", glowEdgeNum=3, hub=3)
-bngeneplotCustom(results = pway, exp = vsted, expSample = incSample, pathNum=15, fontFamily="sans", glowEdgeNum=NULL, hub=3)
+bngeneplot(results = pway,exp = vsted,
+  expSample = incSample, pathNum = 15)
+```
 
+Data frame of raw values used in the inference, data frame containing strength and direction, averaged network, and plot can be obtained by specifying `returnNet=TRUE`
+```{r usecase2, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+ret <- bngeneplot(results = pway,exp = vsted,
+  expSample = incSample, pathNum = 15, returnNet=TRUE)
+ret$str |> head()
+```
+
+## bnpathplot
+
+The relationship between pathways can be drawn by `bnpathplot`. The number to be included in the inference can be specified by `nCategory`.
+
+```{r usecase3, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+bnpathplot(results = pway,exp = vsted,
+  expSample = incSample, nCategory=10, shadowText = TRUE)
+```
+
+## bngeneplotCustom and bnpathplotCustom
+
+`bngeneplotCustom` and `bnpathplotCustom` can be used to customize visualization with more flexibility, like highlighting the nodes and edges of interest by `glowEdgeNum` and `hub`.
+
+```{r usecase4, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
+bnpathplotCustom(results = pway, exp = vsted, expSample = incSample,
+  fontFamily="serif", glowEdgeNum=3, hub=3)
+bngeneplotCustom(results = pway, exp = vsted, expSample = incSample,
+  pathNum=15, fontFamily="sans", glowEdgeNum=NULL, hub=3)
+```
+
+The detailed usage for the package, like including covariates to the plot and probabilistic reasoning is available in the package documentation ([https://noriakis.github.io/CBNplot/](https://noriakis.github.io/CBNplot/)).
+
+```{r}
 sessionInfo()
 ```
 

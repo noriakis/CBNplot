@@ -294,7 +294,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
             depSubG <- V(g)[names(V(g)) %in% c(filteredDep$gene_name) | 
             names(V(g)) %in% tail(colnames(pcs), n=dim(otherVar)[2])]
         } else {
-            depSubG <- V(g)[names(V(g)) %in% c(filteredDep$gene_name)]            
+            depSubG <- V(g)[names(V(g)) %in% c(filteredDep$gene_name)]
         }
 
         g <- igraph::subgraph(g, depSubG)
