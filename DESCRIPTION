@@ -7,7 +7,7 @@ Description: This package provides the visualization of bayesian network inferre
 License: Artistic-2.0
 Encoding: UTF-8
 Depends:
-    R (>= 4.2.2)
+    R (>= 4.2.1)
 Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn (>= 4.7), patchwork, org.Hs.eg.db, clusterProfiler, utils, enrichplot, reshape2, ggforce, dplyr, tidyr, stringr, depmap, ExperimentHub, Rmpfr, graphlayouts, BiocFileCache, ggdist, purrr, pvclust, stats, rlang, oaqc
 Suggests: 
     knitr,

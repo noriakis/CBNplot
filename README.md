@@ -9,6 +9,10 @@ Plot bayesian network inferred from expression data based on the enrichment anal
 ### Installation
 
 ```R
+BiocManager::install("CBNplot")
+```
+
+```R
 library(devtools)
 install_github("noriakis/CBNplot")
 ```
