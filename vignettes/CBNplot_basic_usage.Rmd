@@ -26,6 +26,7 @@ BiocManager::install("CBNplot")
 ### The preprocessing and DEG identification of GSE133624
 ```{r deg, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
 library(CBNplot)
+library(bnlearn)
 library(DESeq2)
 library(org.Hs.eg.db)
 library(GEOquery)
@@ -81,6 +82,14 @@ ret <- bngeneplot(results = pway,exp = vsted,
   expSample = incSample, pathNum = 15, returnNet=TRUE)
 ret$str |> head()
 ```
+
+The resulting network can be converted to `igraph` object using `bnlearn::as.igraph()`.
+
+```{r igraph, include=TRUE, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE}
+g <- bnlearn::as.igraph(ret$av)
+igraph::evcent(g)$vector
+```
+
 
 ## bnpathplot
 
