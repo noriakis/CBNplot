@@ -2,6 +2,7 @@ test_that("bngeneplot: not produce errors in basic usages of variou parameters",
     data("exampleEaRes");data("exampleGeneExp");
     R <- 5
     expect_error( bngeneplot(exampleEaRes, exampleGeneExp, pathNum = 1, R = R), NA)
+    expect_error( bngeneplot(exampleEaRes, exampleGeneExp, pathNum = 1, R = R, edgeLink=TRUE), NA)
     expect_error( bngeneplot(exampleEaRes, exampleGeneExp, pathNum = 1, R = R, hub=2), NA)
     expect_error( bngeneplot(exampleEaRes, exampleGeneExp, pathNum = 1, R = R, convertSymbol=FALSE), NA)
     expect_error( bngeneplot(exampleEaRes, exampleGeneExp, pathNum = 1, R = R, returnNet=T), NA)

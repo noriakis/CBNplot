@@ -38,6 +38,7 @@ bnpathplotCustom(
   algorithm.args = NULL,
   strengthPlot = FALSE,
   nStrength = 10,
+  edgeLink = FALSE,
   strThresh = NULL,
   hub = NULL,
   glowEdgeNum = NULL,
@@ -128,6 +129,8 @@ bnlearn structure learnng function}
 \item{strengthPlot}{append the barplot depicting edges with high strength}
 
 \item{nStrength}{specify how many edges are included in the strength plot}
+
+\item{edgeLink}{use geom_edge_link() instead of geom_edge_diagonal()}
 
 \item{strThresh}{threshold for strength, automatically determined if NULL}
 

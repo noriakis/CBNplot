@@ -45,6 +45,7 @@
 #' @param backCol color of background in network plot
 #' @param barTextCol text color in barplot
 #' @param barPal bar color
+#' @param edgeLink use geom_edge_link() instead of geom_edge_diagonal()
 #' @param barBackCol background color in barplot
 #' @param barLegendKeyCol legend key color in barplot
 #' @param barAxisCol axis color in barplot
@@ -80,7 +81,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
                             returnNet=FALSE, otherVar=NULL, otherVarName=NULL,
                             onlyDf=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
                             dep=NULL, sizeDep=FALSE, orgDb=org.Hs.eg.db,
-                            bypassConverting=FALSE,
+                            bypassConverting=FALSE, edgeLink=FALSE,
                             cellLineName="5637_URINARY_TRACT",
                             fontFamily="sans", strengthPlot=FALSE,
                             nStrength=10, strThresh=NULL, hub=NULL,
@@ -349,18 +350,33 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
     ## Plot
     if (length(pathNum) == 1) {
         delG <- delete.vertices(g, igraph::degree(g)==0)
-        p <- ggraph(delG, layout=layout) +
-            geom_edge_diagonal(edge_alpha=0.3,
-                position="identity",
-                aes_(edge_colour=~color, width=~width, label=~label),
-                label_size=3,
-                label_colour=NA,
-                family=fontFamily,
-                angle_calc = "along",
-                label_dodge=unit(3,'mm'),
-                arrow=arrow(length=unit(4, 'mm')),
-                end_cap=circle(5, 'mm'))+
-            geom_node_point(aes_(color=~color, size=~size, shape=~shape),
+
+        if (edgeLink) {
+            p <- ggraph(delG, layout=layout) +
+                geom_edge_link(edge_alpha=0.3,
+                    position="identity",
+                    aes_(edge_colour=~color, width=~width, label=~label),
+                    label_size=3,
+                    label_colour=NA,
+                    family=fontFamily,
+                    angle_calc = "along",
+                    label_dodge=unit(3,'mm'),
+                    arrow=arrow(length=unit(4, 'mm')),
+                    end_cap=circle(5, 'mm'))
+        } else {
+            p <- ggraph(delG, layout=layout) +
+                geom_edge_diagonal(edge_alpha=0.3,
+                    position="identity",
+                    aes_(edge_colour=~color, width=~width, label=~label),
+                    label_size=3,
+                    label_colour=NA,
+                    family=fontFamily,
+                    angle_calc = "along",
+                    label_dodge=unit(3,'mm'),
+                    arrow=arrow(length=unit(4, 'mm')),
+                    end_cap=circle(5, 'mm'))            
+        }
+        p <- p + geom_node_point(aes_(color=~color, size=~size, shape=~shape),
                             show.legend=TRUE, alpha=0.4)+
             scale_color_continuous(low=nodePal[1], high=nodePal[2],
                 name="expression",
@@ -406,14 +422,25 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
 
         if (!is.null(glowEdgeNum)){
             for (i in seq_len(layers+1)) {
-                p <- p + geom_edge_diagonal(
-                    position="identity",
-                    aes_(edge_colour=~glowEdge,
-                        edge_alpha=~alphaEdge),
-                    width=edgeSize+(glow_edge_size*i),
-                    arrow=arrow(length=unit(i*0.1, 'mm')),
-                    end_cap=circle(5, 'mm')
-                )
+                if (edgeLink) {
+                    p <- p + geom_edge_link(
+                        position="identity",
+                        aes_(edge_colour=~glowEdge,
+                            edge_alpha=~alphaEdge),
+                        width=edgeSize+(glow_edge_size*i),
+                        arrow=arrow(length=unit(i*0.1, 'mm')),
+                        end_cap=circle(5, 'mm')
+                    )
+                } else {
+                    p <- p + geom_edge_diagonal(
+                        position="identity",
+                        aes_(edge_colour=~glowEdge,
+                            edge_alpha=~alphaEdge),
+                        width=edgeSize+(glow_edge_size*i),
+                        arrow=arrow(length=unit(i*0.1, 'mm')),
+                        end_cap=circle(5, 'mm')
+                    )                    
+                }
             }
         }
 

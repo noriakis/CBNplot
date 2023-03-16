@@ -13,6 +13,7 @@ bngeneplot(
   returnNet = FALSE,
   algorithm.args = NULL,
   bypassConverting = FALSE,
+  edgeLink = FALSE,
   pathNum = NULL,
   convertSymbol = TRUE,
   expRow = "ENSEMBL",
@@ -78,6 +79,8 @@ If you use custom annotation databases that
 does not have SYMBOL listed in keys.
 ID of rownames and those listed in EA result
 must be same.}
+
+\item{edgeLink}{use geom_edge_link() instead of geom_edge_diagonal()}
 
 \item{pathNum}{the pathway number
 (the number of row of the original result,

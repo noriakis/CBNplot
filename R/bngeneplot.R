@@ -61,6 +61,7 @@
 #' @param onlyDf return only data.frame used for inference
 #' @param orgDb perform clusterProfiler::setReadable
 #'              based on this organism database
+#' @param edgeLink use geom_edge_link() instead of geom_edge_diagonal()
 #' @param shadowText whether to use shadow text for the better readability
 #'                    default: TRUE
 #' @param bgColor color for text background when shadowText is TRUE
@@ -90,7 +91,7 @@
 
 bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                         returnNet=FALSE, algorithm.args=NULL,
-                        bypassConverting=FALSE,
+                        bypassConverting=FALSE, edgeLink=FALSE,
                         pathNum=NULL, convertSymbol=TRUE, expRow="ENSEMBL",
                         interactive=FALSE, cexCategory=1, cl=NULL,
                         showDir=FALSE, chooseDir=FALSE, scoreType="bic-g",
@@ -461,7 +462,21 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
             } else {
                 delG <- g
             }
-            p <- ggraph(delG, layout=layout) + 
+
+            if (edgeLink) {
+                p <- ggraph(delG, layout=layout) + 
+                geom_edge_link(edge_alpha=1,
+                                    position="identity",
+                                    aes_(edge_colour=~color,
+                                        width=~width, label=~label),
+                                    label_size=3*(labelSize/4),
+                                    label_colour=NA,
+                                    angle_calc = "along",
+                                    label_dodge=unit(3,'mm'),
+                                    arrow=arrow(length=unit(4, 'mm')),
+                                    end_cap=circle(5, 'mm'))
+            } else {
+                p <- ggraph(delG, layout=layout) + 
                 geom_edge_diagonal(edge_alpha=1,
                                     position="identity",
                                     aes_(edge_colour=~color,
@@ -471,7 +486,10 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                                     angle_calc = "along",
                                     label_dodge=unit(3,'mm'),
                                     arrow=arrow(length=unit(4, 'mm')),
-                                    end_cap=circle(5, 'mm'))+
+                                    end_cap=circle(5, 'mm'))
+            }
+
+            p <- p +
                 geom_node_point(aes_(color=~color, size=~size, shape=~shape),
                     show.legend=TRUE)+
                 scale_color_continuous(low="blue", high="red",
@@ -558,17 +576,32 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                 }
 
                 ovlELen <- length(E(refPlot))
-                intP <- ggraph(refPlot, layout=layout) + 
-                    geom_edge_diagonal(edge_alpha=1,
-                                    position="identity",
-                                    aes_(edge_colour=~color,
-                                        width=~width, label=~label),
-                                    label_size=3*(labelSize/4),
-                                    label_colour=NA,
-                                    angle_calc = "along",
-                                    label_dodge=unit(3,'mm'),
-                                    arrow=arrow(length=unit(4, 'mm')),
-                                    end_cap=circle(5, 'mm'))+
+                if (edgeLink) {
+                    intP <- ggraph(refPlot, layout=layout) + 
+                        geom_edge_link(edge_alpha=1,
+                                        position="identity",
+                                        aes_(edge_colour=~color,
+                                            width=~width, label=~label),
+                                        label_size=3*(labelSize/4),
+                                        label_colour=NA,
+                                        angle_calc = "along",
+                                        label_dodge=unit(3,'mm'),
+                                        arrow=arrow(length=unit(4, 'mm')),
+                                        end_cap=circle(5, 'mm'))
+                } else {
+                    intP <- ggraph(refPlot, layout=layout) + 
+                        geom_edge_diagonal(edge_alpha=1,
+                                        position="identity",
+                                        aes_(edge_colour=~color,
+                                            width=~width, label=~label),
+                                        label_size=3*(labelSize/4),
+                                        label_colour=NA,
+                                        angle_calc = "along",
+                                        label_dodge=unit(3,'mm'),
+                                        arrow=arrow(length=unit(4, 'mm')),
+                                        end_cap=circle(5, 'mm'))    
+                }
+                intP <- intP +
                     geom_node_point(aes_(color=~color, size=~size,
                         shape=~shape), show.legend=TRUE)+
                     scale_color_continuous(low="blue", high="red",
@@ -640,17 +673,32 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
             }
             xy <- graphlayouts::layout_as_backbone(
                 igraph::as.undirected(delG))$xy
-            p <- ggraph(delG, layout="manual", x=xy[,1], y=xy[,2]) + 
-                    geom_edge_diagonal(edge_alpha=1,
-                                position="identity",
-                                aes_(edge_colour=~color, width=~width,
-                                    label=~label),
-                                label_size=3*(labelSize/4),
-                                label_colour=NA,
-                                angle_calc = "along",
-                                label_dodge=unit(3,'mm'),
-                                arrow=arrow(length=unit(4, 'mm')),
-                                end_cap=circle(5, 'mm'))+
+            if (edgeLink) {
+                p <- ggraph(delG, layout="manual", x=xy[,1], y=xy[,2]) + 
+                        geom_edge_link(edge_alpha=1,
+                                    position="identity",
+                                    aes_(edge_colour=~color, width=~width,
+                                        label=~label),
+                                    label_size=3*(labelSize/4),
+                                    label_colour=NA,
+                                    angle_calc = "along",
+                                    label_dodge=unit(3,'mm'),
+                                    arrow=arrow(length=unit(4, 'mm')),
+                                    end_cap=circle(5, 'mm'))
+            } else {
+                 p <- ggraph(delG, layout="manual", x=xy[,1], y=xy[,2]) + 
+                        geom_edge_diagonal(edge_alpha=1,
+                                    position="identity",
+                                    aes_(edge_colour=~color, width=~width,
+                                        label=~label),
+                                    label_size=3*(labelSize/4),
+                                    label_colour=NA,
+                                    angle_calc = "along",
+                                    label_dodge=unit(3,'mm'),
+                                    arrow=arrow(length=unit(4, 'mm')),
+                                    end_cap=circle(5, 'mm'))                       
+            }
+            p <- p +
                 geom_node_point(aes_(color=~color, size=~size, shape=~shape),
                     show.legend=TRUE)+
                 ggforce::geom_mark_hull(

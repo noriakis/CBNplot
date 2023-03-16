@@ -33,6 +33,7 @@ bngeneplotCustom(
   sizeDep = FALSE,
   orgDb = org.Hs.eg.db,
   bypassConverting = FALSE,
+  edgeLink = FALSE,
   cellLineName = "5637_URINARY_TRACT",
   fontFamily = "sans",
   strengthPlot = FALSE,
@@ -122,6 +123,8 @@ based on this organism database}
 \item{bypassConverting}{bypass the symbol converting
 ID of rownames and those listed in EA result
 must be same}
+
+\item{edgeLink}{use geom_edge_link() instead of geom_edge_diagonal()}
 
 \item{cellLineName}{the cell line name to be included}
 
