@@ -627,9 +627,9 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                                 aes_(label=~stringr::str_wrap(name, width = 25)
                             ),
                         check_overlap=TRUE, repel=TRUE, size = labelSize,
-                        color = "black",
-                        bg.color = "white", segment.color="black",
-                        bg.r = .15)
+                    color = textColor,
+                    bg.color = bgColor, segment.color="black",
+                    bg.r = .15)
                 } else {
                     intP <- intP + geom_node_text(
                         aes_(label=~stringr::str_wrap(name, width = 25)),
@@ -686,7 +686,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                                     arrow=arrow(length=unit(4, 'mm')),
                                     end_cap=circle(5, 'mm'))
             } else {
-                 p <- ggraph(delG, layout="manual", x=xy[,1], y=xy[,2]) + 
+                p <- ggraph(delG, layout="manual", x=xy[,1], y=xy[,2]) + 
                         geom_edge_diagonal(edge_alpha=1,
                                     position="identity",
                                     aes_(edge_colour=~color, width=~width,
@@ -696,7 +696,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                                     angle_calc = "along",
                                     label_dodge=unit(3,'mm'),
                                     arrow=arrow(length=unit(4, 'mm')),
-                                    end_cap=circle(5, 'mm'))                       
+                                    end_cap=circle(5, 'mm'))
             }
             p <- p +
                 geom_node_point(aes_(color=~color, size=~size, shape=~shape),
@@ -715,10 +715,21 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
                 scale_edge_color_continuous(low="dodgerblue", high="tomato",
                     name="strength")+
                 guides(edge_color = guide_edge_colorbar(title.vjust = 3))+
-                scale_shape_identity()+
-                geom_node_text(aes_(label=~name), check_overlap=TRUE,
+                scale_shape_identity()
+            if (shadowText) {
+                p <- p + geom_node_text(aes_(label=~name), check_overlap=TRUE,
+                    repel=TRUE,
+                    size = labelSize,
+                    color = textColor,
+                    bg.color = bgColor, segment.color="black",
+                    bg.r = .15) +
+                theme_graph()
+            } else {
+                p <- p + geom_node_text(aes_(label=~name), check_overlap=TRUE,
                     repel=TRUE, size = labelSize) +
                 theme_graph()
+
+            }
         }
 
         if (strengthPlot){

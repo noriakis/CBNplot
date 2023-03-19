@@ -386,9 +386,11 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
                         arrow=arrow(length=unit(4, 'mm')),
                         end_cap=circle(5, 'mm'))                
             }
-            p <- p + geom_node_point(aes_(color=~color, size=~size, shape=~shape),
+            p <- p + geom_node_point(aes_(color=~color,
+                size=~size, shape=~shape),
                             show.legend=TRUE, alpha=0.4)+
-            scale_color_continuous(low=nodePal[1], high=nodePal[2], name=color,
+            scale_color_continuous(low=nodePal[1], high=nodePal[2],
+                name=color,
                                     na.value="transparent") +
             scale_size(range=c(scaleSizePathLow,
                 scaleSizePathHigh) * cexCategory, name=sizeLab)+
