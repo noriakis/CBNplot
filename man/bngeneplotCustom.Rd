@@ -52,6 +52,8 @@ bngeneplotCustom(
   scoreType = "bic-g",
   barLegendKeyCol = "white",
   barAxisCol = "black",
+  bg.colour = NULL,
+  bg.r = 0.1,
   barPanelGridCol = "black",
   titleSize = 24,
   seed = 1
@@ -161,6 +163,10 @@ must be same}
 \item{barLegendKeyCol}{legend key color in barplot}
 
 \item{barAxisCol}{axis color in barplot}
+
+\item{bg.colour}{parameter to pass to geom_node_text}
+
+\item{bg.r}{parameter to pass to geom_node_text}
 
 \item{barPanelGridCol}{panel grid color in barplot}
 

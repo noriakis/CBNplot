@@ -62,6 +62,8 @@
 #' @param remainCont Specify characters when perform discretization,
 #'                   if some columns are to be remain continuous
 #' @param seed A random seed to make the analysis reproducible, default is 1.
+#' @param bg.colour parameter to pass to geom_node_text
+#' @param bg.r parameter to pass to geom_node_text
 #' 
 #' @examples
 #' data("exampleEaRes");data("exampleGeneExp")
@@ -91,6 +93,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
                             barTextCol="black", barPal=c("red","blue"),
                             barBackCol="white", scoreType="bic-g",
                             barLegendKeyCol="white", barAxisCol="black",
+                            bg.colour=NULL, bg.r=0.1,
                             barPanelGridCol="black", titleSize=24, seed = 1) {
     if (length(nodePal)!=2 ||
         length(edgePal)!=2 ||
@@ -387,10 +390,7 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
             scale_edge_color_continuous(low=edgePal[1],
                 high=edgePal[2], name="strength",
                 na.value="transparent")+
-            guides(edge_color = guide_edge_colorbar(title.vjust = 3))+
-            geom_node_text(aes_(label=~name, color=~color),
-                check_overlap=TRUE, nudge_y=0.2, repel=TRUE, fontface="bold",
-                family=fontFamily, size = labelSize) +
+            guides(edge_color = guide_edge_colorbar(title.vjust = 3)) +
             scale_shape_identity()+
             theme_graph() +
             ggtitle(res[pathNum, "Description"])+
@@ -443,7 +443,11 @@ bngeneplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20,
                 }
             }
         }
-
+        bg.colour <- ifelse(is.null(bg.colour), "transparent", bg.colour)
+        p <- p + geom_node_text(aes_(label=~name, color=~color),
+                check_overlap=TRUE, nudge_y=0.2, repel=TRUE, fontface="bold",
+                family=fontFamily, size = labelSize, bg.colour=bg.colour,
+                bg.r = bg.r)
         p <- p + scale_alpha(range = c(0.01, 0.1), guide="none")+
             scale_edge_alpha(range=c(0.05, 0.1),guide="none")
 

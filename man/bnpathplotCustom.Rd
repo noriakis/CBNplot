@@ -54,6 +54,8 @@ bnpathplotCustom(
   orgDb = org.Hs.eg.db,
   barAxisCol = "black",
   barPanelGridCol = "black",
+  bg.colour = NULL,
+  bg.r = 0.1,
   seed = 1,
   bypassConverting = FALSE
 )
@@ -162,6 +164,10 @@ based on this organism database}
 \item{barAxisCol}{axis color in barplot}
 
 \item{barPanelGridCol}{panel grid color in barplot}
+
+\item{bg.colour}{parameter to pass to geom_node_text}
+
+\item{bg.r}{parameter to pass to geom_node_text}
 
 \item{seed}{A random seed to make the analysis reproducible, default is 1.}
 
