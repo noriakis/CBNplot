@@ -10,6 +10,9 @@ An object of class \code{enrichResult} with 47 rows and 9 columns.
 \usage{
 data(exampleEaRes)
 }
+\value{
+example enrichment analysis result
+}
 \description{
 An example enrichment analysis result to be used for testing purpose.
 The result was produced by running ReactomePA::enrichPathway() and
