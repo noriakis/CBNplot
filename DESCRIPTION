@@ -2,16 +2,28 @@ Package: CBNplot
 Type: Package
 Title: plot bayesian network inferred from gene expression data based on enrichment analysis results
 Version: 0.99.2
-Authors@R: person("Noriaki", "Sato", email = "nori5030@kuhp.kyoto-u.ac.jp", role = c("cre", "aut"))
+Authors@R: person("Noriaki", "Sato", email = "nori@hgc.jp", role = c("cre", "aut"))
 Description: This package provides the visualization of bayesian network inferred from gene expression data. The networks are based on enrichment analysis results inferred from packages including clusterProfiler and ReactomePA. The networks between pathways and genes inside the pathways can be inferred and visualized.
 License: Artistic-2.0
 Encoding: UTF-8
 Depends:
     R (>= 4.2.0)
-Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn (>= 4.7), patchwork, org.Hs.eg.db, clusterProfiler, utils, enrichplot, reshape2, ggforce, dplyr, tidyr, stringr, depmap, ExperimentHub, Rmpfr, graphlayouts, BiocFileCache, ggdist, purrr, pvclust
-Suggests: knitr, arules, concaveman, ReactomePA, bnviewer, DESeq2, GEOquery, rmarkdown
-biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network
+Imports: ggplot2, magrittr, graphite, ggraph, igraph, bnlearn (>= 4.7), patchwork, org.Hs.eg.db, clusterProfiler, utils, enrichplot, reshape2, ggforce, dplyr, tidyr, stringr, depmap, ExperimentHub, Rmpfr, graphlayouts, BiocFileCache, ggdist, purrr, pvclust, stats, rlang, oaqc
+Suggests: 
+    knitr,
+    arules,
+    concaveman,
+    ReactomePA,
+    bnviewer,
+    DESeq2,
+    GEOquery,
+    rmarkdown,
+    withr,
+    BiocStyle,
+    testthat (>= 3.0.0)
+biocViews: Visualization, Bayesian, GeneExpression, NetworkInference, Pathways, Reactome, Network, NetworkEnrichment, GeneSetEnrichment
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 URL: https://github.com/noriakis/CBNplot
 BugReports: https://github.com/noriakis/CBNplot/issues
+Config/testthat/edition: 3

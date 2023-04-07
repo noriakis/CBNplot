@@ -38,6 +38,7 @@ bnpathplotCustom(
   algorithm.args = NULL,
   strengthPlot = FALSE,
   nStrength = 10,
+  edgeLink = FALSE,
   strThresh = NULL,
   hub = NULL,
   glowEdgeNum = NULL,
@@ -52,17 +53,23 @@ bnpathplotCustom(
   barLegendKeyCol = "white",
   orgDb = org.Hs.eg.db,
   barAxisCol = "black",
-  barPanelGridCol = "black"
+  barPanelGridCol = "black",
+  bg.colour = NULL,
+  bg.r = 0.1,
+  seed = 1,
+  bypassConverting = FALSE
 )
 }
 \arguments{
-\item{results}{the enrichment analysis result from clusterProfiler or ReactomePA}
+\item{results}{the enrichment analysis result}
 
 \item{exp}{gene expression matrix}
 
-\item{expSample}{candidate rows to be included in the inference, default to all}
+\item{expSample}{candidate rows to be included in the inference
+default to all}
 
-\item{algo}{structure learning method used in boot.strength(), default to "hc"}
+\item{algo}{structure learning method used in boot.strength()
+default to "hc"}
 
 \item{R}{the number of bootstrap}
 
@@ -88,9 +95,11 @@ bnpathplotCustom(
 
 \item{disc}{discretize the expressoin data}
 
-\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+\item{tr}{Specify data.frame if one needs to discretize
+as the same parameters as the other dataset}
 
-\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+\item{remainCont}{Specify characters when perform discretization,
+if some columns are to be remain continuous}
 
 \item{qvalueCutOff}{the cutoff value for qvalue}
 
@@ -116,11 +125,14 @@ bnpathplotCustom(
 
 \item{onlyDf}{return only data.frame used for inference}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to
+bnlearn structure learnng function}
 
 \item{strengthPlot}{append the barplot depicting edges with high strength}
 
 \item{nStrength}{specify how many edges are included in the strength plot}
+
+\item{edgeLink}{use geom_edge_link() instead of geom_edge_diagonal()}
 
 \item{strThresh}{threshold for strength, automatically determined if NULL}
 
@@ -146,11 +158,22 @@ bnpathplotCustom(
 
 \item{barLegendKeyCol}{legend key color in barplot}
 
-\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+\item{orgDb}{perform clusterProfiler::setReadable
+based on this organism database}
 
 \item{barAxisCol}{axis color in barplot}
 
 \item{barPanelGridCol}{panel grid color in barplot}
+
+\item{bg.colour}{parameter to pass to geom_node_text}
+
+\item{bg.r}{parameter to pass to geom_node_text}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
+
+\item{bypassConverting}{bypass the symbol converting
+ID of rownames and those listed in EA result
+must be same}
 }
 \value{
 ggplot2 object
@@ -160,5 +183,6 @@ Plot pathway relationship using customized theme
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp, fontFamily="sans", glowEdgeNum=3, hub=3)
+res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp,
+                        fontFamily="sans", glowEdgeNum=3, hub=3)
 }

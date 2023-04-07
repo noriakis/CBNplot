@@ -11,6 +11,8 @@ An object of class \code{enrichResult} with 47 rows and 9 columns.
 data(exampleEaRes)
 }
 \description{
-An example enrichment analysis result to be used for testing purpose
+An example enrichment analysis result to be used for testing purpose.
+The result was produced by running ReactomePA::enrichPathway() and
+subsequent clusterProfiler::setReadable() on `exampleGeneExp`.
 }
 \keyword{datasets}

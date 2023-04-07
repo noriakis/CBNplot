@@ -32,6 +32,8 @@ bngeneplotCustom(
   dep = NULL,
   sizeDep = FALSE,
   orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE,
+  edgeLink = FALSE,
   cellLineName = "5637_URINARY_TRACT",
   fontFamily = "sans",
   strengthPlot = FALSE,
@@ -50,24 +52,31 @@ bngeneplotCustom(
   scoreType = "bic-g",
   barLegendKeyCol = "white",
   barAxisCol = "black",
+  bg.colour = NULL,
+  bg.r = 0.1,
   barPanelGridCol = "black",
-  titleSize = 24
+  titleSize = 24,
+  seed = 1
 )
 }
 \arguments{
-\item{results}{the enrichment analysis result from clusterProfiler or ReactomePA}
+\item{results}{the enrichment analysis result}
 
 \item{exp}{gene expression matrix}
 
-\item{expSample}{candidate rows to be included in the inference, default to all}
+\item{expSample}{candidate rows to be included in the inference
+default to all}
 
-\item{algo}{structure learning method used in boot.strength(), default to "hc"}
+\item{algo}{structure learning method used in boot.strength()
+default to "hc"}
 
 \item{R}{the number of bootstrap}
 
-\item{pathNum}{the pathway number (the number of row of the original result, ordered by p-value)}
+\item{pathNum}{the pathway number
+(the number of row of the original result, ordered by p-value)}
 
-\item{convertSymbol}{whether the label of resulting network is converted to symbol, default to TRUE}
+\item{convertSymbol}{whether the label of resulting network is
+converted to symbol, default to TRUE}
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
@@ -81,7 +90,8 @@ bngeneplotCustom(
 
 \item{chooseDir}{if undirected edges are present, choose direction of edges}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to 
+bnlearn structure learnng function}
 
 \item{labelSize}{the size of label of the nodes}
 
@@ -99,15 +109,24 @@ bngeneplotCustom(
 
 \item{disc}{discretize the expressoin data}
 
-\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+\item{tr}{Specify data.frame if one needs to discretize
+as the same parameters as the other dataset}
 
-\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+\item{remainCont}{Specify characters when perform discretization,
+if some columns are to be remain continuous}
 
 \item{dep}{the tibble storing dependency score from library depmap}
 
 \item{sizeDep}{whether to reflect DepMap score to the node size}
 
-\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+\item{orgDb}{perform clusterProfiler::setReadable
+based on this organism database}
+
+\item{bypassConverting}{bypass the symbol converting
+ID of rownames and those listed in EA result
+must be same}
+
+\item{edgeLink}{use geom_edge_link() instead of geom_edge_diagonal()}
 
 \item{cellLineName}{the cell line name to be included}
 
@@ -145,9 +164,15 @@ bngeneplotCustom(
 
 \item{barAxisCol}{axis color in barplot}
 
+\item{bg.colour}{parameter to pass to geom_node_text}
+
+\item{bg.r}{parameter to pass to geom_node_text}
+
 \item{barPanelGridCol}{panel grid color in barplot}
 
 \item{titleSize}{the size of title}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
 }
 \value{
 ggplot2 object
@@ -157,5 +182,7 @@ Plot gene relationship within the specified pathway using customized theme
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp, chooseDir=TRUE, pathNum=1, glowEdgeNum=NULL, hub=3, R=40, fontFamily="sans")
+res <- bngeneplotCustom(results=exampleEaRes, exp=exampleGeneExp,
+                        pathNum=1, glowEdgeNum=NULL, hub=3, R=40,
+                        fontFamily="sans")
 }

@@ -17,7 +17,9 @@ Take the list of networks and returns the F-measures
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-net1 <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
-net2 <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
+net1 <- bngeneplot(results = exampleEaRes,
+        exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
+net2 <- bngeneplot(results = exampleEaRes,
+        exp = exampleGeneExp, pathNum = 1, R = 10, returnNet=TRUE)
 res <- compareBNs(list(net1$av, net2$av))
 }

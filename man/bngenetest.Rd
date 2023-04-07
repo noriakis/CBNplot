@@ -15,31 +15,43 @@ bngenetest(
   pathNum = NULL,
   convertSymbol = TRUE,
   expRow = "ENSEMBL",
-  scoreType = "aic-g"
+  scoreType = "aic-g",
+  orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE
 )
 }
 \arguments{
-\item{results}{the enrichment analysis result from clusterProfiler or ReactomePA}
+\item{results}{the enrichment analysis result}
 
 \item{exp}{gene expression matrix}
 
-\item{expSample}{candidate rows to be included in the inference, default to all}
+\item{expSample}{candidate rows to be included in the inference
+default to all}
 
-\item{algo}{structure learning method used in boot.strength(), default to "hc"}
+\item{algo}{structure learning method used in boot.strength()
+default to "hc"}
 
 \item{Rrange}{the sequence of R values to be tested}
 
 \item{cl}{cluster object from parallel::makeCluster()}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to
+bnlearn structure learnng function}
 
-\item{pathNum}{the pathway number (the number of row of the original result, ordered by p-value)}
+\item{pathNum}{the pathway number (the number of row of the original result,
+ordered by p-value)}
 
-\item{convertSymbol}{whether the label of resulting network is converted to symbol, default to TRUE}
+\item{convertSymbol}{whether the label of resulting network is
+converted to symbol, default to TRUE}
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
 \item{scoreType}{return the specified scores}
+
+\item{orgDb}{perform clusterProfiler::setReadable
+based on this organism database}
+
+\item{bypassConverting}{bypass symbol converting}
 }
 \value{
 list of graphs and scores
@@ -49,5 +61,6 @@ Testing various R for bayesian network between genes
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bngenetest(results = exampleEaRes, exp = exampleGeneExp, algo="hc", Rrange=seq(10, 30, 10), pathNum=1, scoreType="bge")
+res <- bngenetest(results = exampleEaRes, exp = exampleGeneExp,
+algo="hc", Rrange=seq(10, 30, 10), pathNum=1, scoreType="bge")
 }

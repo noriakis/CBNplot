@@ -12,6 +12,8 @@ bnpathtest(
   algorithm.args = NULL,
   expRow = "ENSEMBL",
   cl = NULL,
+  orgDb = org.Hs.eg.db,
+  bypassConverting = FALSE,
   qvalueCutOff = 0.05,
   adjpCutOff = 0.05,
   nCategory = 15,
@@ -20,19 +22,27 @@ bnpathtest(
 )
 }
 \arguments{
-\item{results}{the enrichment analysis result from clusterProfiler or ReactomePA}
+\item{results}{the enrichment analysis result}
 
 \item{exp}{gene expression matrix}
 
-\item{expSample}{candidate rows to be included in the inference, default to all}
+\item{expSample}{candidate rows to be included in the inference
+default to all}
 
-\item{algo}{structure learning method used in boot.strength(), default to "hc"}
+\item{algo}{structure learning method used in boot.strength()
+default to "hc"}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to
+bnlearn structure learnng function}
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
 \item{cl}{cluster object from parallel::makeCluster()}
+
+\item{orgDb}{perform clusterProfiler::setReadable
+based on this organism database}
+
+\item{bypassConverting}{bypass symbol converting}
 
 \item{qvalueCutOff}{the cutoff value for qvalue}
 
@@ -52,5 +62,7 @@ Testing various R for bayesian network between pathways
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bnpathtest(results = exampleEaRes, exp = exampleGeneExp, algo="hc", Rrange=seq(10, 30, 10), expRow = "ENSEMBL", scoreType="bge")
+res <- bnpathtest(results = exampleEaRes, exp = exampleGeneExp,
+       algo="hc", Rrange=seq(10, 30, 10), expRow = "ENSEMBL",
+       scoreType="bge")
 }

@@ -12,6 +12,8 @@ bngeneplot(
   R = 20,
   returnNet = FALSE,
   algorithm.args = NULL,
+  bypassConverting = FALSE,
+  edgeLink = FALSE,
   pathNum = NULL,
   convertSymbol = TRUE,
   expRow = "ENSEMBL",
@@ -49,27 +51,43 @@ bngeneplot(
   strengthPlot = FALSE,
   nStrength = 10,
   strThresh = NULL,
-  hub = NULL
+  hub = NULL,
+  seed = 1,
+  useSiGN = FALSE
 )
 }
 \arguments{
-\item{results}{the enrichment analysis result from clusterProfiler or ReactomePA}
+\item{results}{the enrichment analysis result}
 
 \item{exp}{gene expression matrix}
 
-\item{expSample}{candidate samples to be included in the inference, default to all}
+\item{expSample}{candidate samples to be included in the inference
+default to all}
 
-\item{algo}{structure learning method used in boot.strength(), default to "hc"}
+\item{algo}{structure learning method used in boot.strength()
+default to "hc"}
 
 \item{R}{the number of bootstrap}
 
 \item{returnNet}{whether to return the network}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to bnlearn
+structure learnng function}
 
-\item{pathNum}{the pathway number (the number of row of the original result, ordered by p-value)}
+\item{bypassConverting}{bypass the symbol converting
+If you use custom annotation databases that 
+does not have SYMBOL listed in keys.
+ID of rownames and those listed in EA result
+must be same.}
 
-\item{convertSymbol}{whether the label of resulting network is converted to symbol, default to TRUE}
+\item{edgeLink}{use geom_edge_link() instead of geom_edge_diagonal()}
+
+\item{pathNum}{the pathway number
+(the number of row of the original result,
+ ordered by p-value)}
+
+\item{convertSymbol}{whether the label of resulting network is 
+converted to symbol, default to TRUE}
 
 \item{expRow}{the type of the identifier of rows of expression matrix}
 
@@ -81,7 +99,8 @@ bngeneplot(
 
 \item{showDir}{show the confidence of direction of edges}
 
-\item{chooseDir}{if undirected edges are present, choose direction of edges (default: FALSE)}
+\item{chooseDir}{if undirected edges are present,
+choose direction of edges (default: FALSE)}
 
 \item{scoreType}{score type to use on choosing direction}
 
@@ -89,7 +108,8 @@ bngeneplot(
 
 \item{layout}{ggraph layout, default to "nicely"}
 
-\item{clusterAlpha}{if specified multiple pathways, the parameter is passed to geom_mark_hull()}
+\item{clusterAlpha}{if specified multiple pathways,
+the parameter is passed to geom_mark_hull()}
 
 \item{strType}{"normal" or "ms" for multiscale implementation}
 
@@ -103,9 +123,11 @@ bngeneplot(
 
 \item{disc}{discretize the expressoin data}
 
-\item{tr}{Specify data.frame if one needs to discretize as the same parameters as the other dataset}
+\item{tr}{Specify data.frame if one needs to discretize
+as the same parametersas the other dataset}
 
-\item{remainCont}{Specify characters when perform discretization, if some columns are to be remain continuous}
+\item{remainCont}{Specify characters when perform discretization,
+if some columns are to be remain continuous}
 
 \item{sp}{query to graphite::pathways(), default to "hsapiens"}
 
@@ -127,9 +149,11 @@ bngeneplot(
 
 \item{showLineage}{show the dependency score across the lineage}
 
-\item{orgDb}{perform clusterProfiler::setReadable based on this organism database}
+\item{orgDb}{perform clusterProfiler::setReadable
+based on this organism database}
 
-\item{shadowText}{whether to use shadow text for the better readability (default: TRUE)}
+\item{shadowText}{whether to use shadow text for the better readability
+default: TRUE}
 
 \item{bgColor}{color for text background when shadowText is TRUE}
 
@@ -142,6 +166,14 @@ bngeneplot(
 \item{strThresh}{the threshold for strength}
 
 \item{hub}{visualize the genes with top-n hub scores}
+
+\item{seed}{A random seed to make the analysis reproducible, default is 1.}
+
+\item{useSiGN}{default to FALSE.
+For using SiGN-BN in the function in Windows 10/11,
+1. Download the SiGN-BN HC+BS binary in WSL
+(https://sign.hgc.jp/signbn/download.html)
+2. Set PATH to executable (sign.1.8.3)}
 }
 \value{
 ggplot2 object
@@ -151,6 +183,7 @@ Plot gene relationship within the specified pathway
 }
 \examples{
 data("exampleEaRes");data("exampleGeneExp")
-res <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1, R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
+res <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1,
+                  R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
 
 }

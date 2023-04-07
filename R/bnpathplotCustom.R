@@ -2,12 +2,15 @@
 #'
 #' Plot pathway relationship using customized theme
 #'
-#' @param results the enrichment analysis result from clusterProfiler or ReactomePA
+#' @param results the enrichment analysis result
 #' @param exp gene expression matrix
 #' @param expRow the type of the identifier of rows of expression matrix
-#' @param expSample candidate rows to be included in the inference, default to all
-#' @param algo structure learning method used in boot.strength(), default to "hc"
-#' @param algorithm.args parameters to pass to bnlearn structure learnng function
+#' @param expSample candidate rows to be included in the inference
+#'                  default to all
+#' @param algo structure learning method used in boot.strength()
+#'             default to "hc"
+#' @param algorithm.args parameters to pass to
+#'                       bnlearn structure learnng function
 #' @param R the number of bootstrap
 #' @param color color of node, default to adjusted p-value
 #' @param cexCategory scaling factor of size of nodes
@@ -37,6 +40,7 @@
 #' @param backCol color of background in network plot
 #' @param barTextCol text color in barplot
 #' @param barPal bar color
+#' @param edgeLink use geom_edge_link() instead of geom_edge_diagonal()
 #' @param barBackCol background color in barplot
 #' @param barLegendKeyCol legend key color in barplot
 #' @param barAxisCol axis color in barplot
@@ -44,91 +48,131 @@
 #' @param returnNet whether to return the network
 #' @param scoreType score type to use on inference
 #' @param disc discretize the expressoin data
-#' @param tr Specify data.frame if one needs to discretize as the same parameters as the other dataset
-#' @param remainCont Specify characters when perform discretization, if some columns are to be remain continuous
+#' @param tr Specify data.frame if one needs to discretize
+#'           as the same parameters as the other dataset
+#' @param remainCont Specify characters when perform discretization,
+#'                   if some columns are to be remain continuous
 #' @param otherVar other variables to be included in the inference
 #' @param otherVarName the names of other variables
 #' @param onlyDf return only data.frame used for inference
-#' @param orgDb perform clusterProfiler::setReadable based on this organism database
-#'
+#' @param orgDb perform clusterProfiler::setReadable
+#'              based on this organism database
+#' @param bypassConverting bypass the symbol converting
+#'                         ID of rownames and those listed in EA result
+#'                         must be same
+#' @param seed A random seed to make the analysis reproducible, default is 1.
+#' @param bg.colour parameter to pass to geom_node_text
+#' @param bg.r parameter to pass to geom_node_text
 #' @examples 
 #' data("exampleEaRes");data("exampleGeneExp")
-#' res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp, fontFamily="sans", glowEdgeNum=3, hub=3)
+#' res <- bnpathplotCustom(results=exampleEaRes, exp=exampleGeneExp,
+#'                         fontFamily="sans", glowEdgeNum=3, hub=3)
 #' @return ggplot2 object
 #'
 #' @export
 #'
-bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, expRow="ENSEMBL",
-                             color="p.adjust", cexCategory=1, cl=NULL, showDir=FALSE, chooseDir=FALSE,
-                             labelSize=4, layout="nicely", strType="normal", compareRef=FALSE, disc=FALSE, tr=NULL, remainCont=NULL,
-                             qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15, cexLine=1, returnNet=FALSE,
-                             dep=NULL, sizeDep=FALSE, cellLineName="5637_URINARY_TRACT", fontFamily="sans",
-                             otherVar=NULL, otherVarName=NULL, onlyDf=FALSE, algorithm.args=NULL,
-                             strengthPlot=FALSE, nStrength=10, strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
-                             nodePal=c("blue","red"), edgePal=c("blue","red"), textCol="black", backCol="white",
-                             barTextCol="black", barPal=c("red","blue"), barBackCol="white", scoreType="bic-g",
-                             barLegendKeyCol="white", orgDb=org.Hs.eg.db, barAxisCol="black", barPanelGridCol="black") {
-    # if (is.null(hub) || is.null(glowEdgeNum) || hub <= 0 || glowEdgeNum <= 0) {stop("please specify number >= 1 for hub, glowEdgeNum")}
-    if (length(nodePal)!=2 || length(edgePal)!=2 || length(barPal)!=2){stop("Please pick two colors for nodePal, edgePal and barPal.")}
+bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
+                            R=20, expRow="ENSEMBL", color="p.adjust",
+                            cexCategory=1, cl=NULL, showDir=FALSE,
+                            chooseDir=FALSE, labelSize=4, layout="nicely",
+                            strType="normal", compareRef=FALSE, disc=FALSE,
+                            tr=NULL, remainCont=NULL, qvalueCutOff=0.05,
+                            adjpCutOff=0.05, nCategory=15, cexLine=1,
+                            returnNet=FALSE, dep=NULL, sizeDep=FALSE,
+                            cellLineName="5637_URINARY_TRACT",
+                            fontFamily="sans", otherVar=NULL, otherVarName=NULL,
+                            onlyDf=FALSE, algorithm.args=NULL,
+                            strengthPlot=FALSE, nStrength=10, edgeLink=FALSE,
+                            strThresh=NULL, hub=NULL, glowEdgeNum=NULL,
+                            nodePal=c("blue","red"), edgePal=c("blue","red"),
+                            textCol="black", backCol="white",
+                            barTextCol="black", barPal=c("red","blue"),
+                            barBackCol="white", scoreType="bic-g",
+                            barLegendKeyCol="white", orgDb=org.Hs.eg.db,
+                            barAxisCol="black", barPanelGridCol="black",
+                            bg.colour=NULL, bg.r=0.1,
+                            seed = 1, bypassConverting=FALSE) {
+    # if (is.null(hub) ||
+    # is.null(glowEdgeNum) ||
+    # hub <= 0 || glowEdgeNum <= 0) {
+    #     stop("please specify number >= 1 for hub, glowEdgeNum")}
+    if (length(nodePal)!=2 ||
+        length(edgePal)!=2 ||
+        length(barPal)!=2){
+        stop("Please pick two colors for nodePal, edgePal and barPal.")}
     if (compareRef){stop("compareRef is currently not supported.")}
-    if (is.null(expSample)) {expSample=colnames(exp)}
-    if (length(results)>1) {stop("For multiple databases, please use bnpathplot().")}
+    if (is.null(expSample)) {expSample <- colnames(exp)}
+    if (length(results)>1) {
+        stop("For multiple databases, please use bnpathplot().")}
     # if (results@keytype == "kegg"){
     #     resultsGeneType <- "ENTREZID"
     # } else {
     #     resultsGeneType <- results@keytype
     # }
-
+    attributes(results)$result$Description <- gsub("Homo sapiens\r: ",
+                                    "",
+                                    attributes(results)$result$Description)
     if (attributes(results)$class[1]=="enrichResult"){
-        typeOfOntology=results@ontology
+        typeOfOntology <- attributes(results)$ontology
     } else if (attributes(results)$class[1]=="gseaResult"){
-        typeOfOntology=results@setType
+        typeOfOntology <- attributes(results)$setType
     }
-    results <- setReadable(results, OrgDb = orgDb)
+    if (!bypassConverting) {
+        if (!is.null(orgDb)){
+            results <- setReadable(results, OrgDb = orgDb)
+        }
+    }
 
-    tmpCol <- colnames(results@result)
+    tmpCol <- colnames(attributes(results)$result)
     ## Make comparable
     tmpCol[tmpCol=="core_enrichment"] <- "geneID"
     tmpCol[tmpCol=="qvalues"] <- "qvalue"
     tmpCol[tmpCol=="setSize"] <- "Count"
 
-    colnames(results@result) <- tmpCol
-    if (!"enrichmentScore" %in% colnames(results@result)){
-        results@result["enrichmentScore"] <- 0
+    colnames(attributes(results)$result) <- tmpCol
+    if (!"enrichmentScore" %in% colnames(attributes(results)$result)){
+        attributes(results)$result["enrichmentScore"] <- 0
     }
 
     if (sizeDep) {
-        if (is.null(dep)){dep = depmap::depmap_crispr()}
-        filteredDep <- dep %>% filter(cell_line==cellLineName)
+        if (is.null(dep)){dep <- depmap::depmap_crispr()}
+        filteredDep <- dep %>% filter(.data$cell_line==cellLineName)
     }
 
-    res <- results@result
+    res <- attributes(results)$result
 
     pcs <- c()
     pwayNames <- c()
 
     ## Filtering according to qval, pval and nCategory
-    if (!is.null(qvalueCutOff)) { res <- subset(res, qvalue < qvalueCutOff) }
-    if (!is.null(adjpCutOff)) { res <- subset(res, p.adjust < adjpCutOff) }
+    if (!is.null(qvalueCutOff)) {
+        res <- subset(res, res$qvalue < qvalueCutOff) }
+    if (!is.null(adjpCutOff)) {
+        res <- subset(res, res$p.adjust < adjpCutOff) }
     if (nCategory) {
         res <- res[seq_len(nCategory),]
         res <- res[!is.na(res$ID),]
     }
 
-    pathDep = c()
+    pathDep <- c()
     for (i in seq_len(length(rownames(res)))) {
         genesInPathway <- strsplit(res[i, ]$geneID, "/")[[1]]
 
         if (sizeDep){
-            pathDep = c(pathDep, -1 * mean((filteredDep %>% filter(gene_name %in% genesInPathway))$dependency))
+            pathDep <- c(pathDep,
+                -1 * mean((filteredDep %>%
+                    filter(.data$gene_name %in% genesInPathway))$dependency))
         }
-
-        genesInPathway <- clusterProfiler::bitr(genesInPathway,
-                                                fromType="SYMBOL",
-                                                toType=expRow,
-                                                OrgDb=org.Hs.eg.db)[expRow][,1]
-
-        pathwayMatrix <- exp[ intersect(rownames(exp), genesInPathway), expSample ]
+        if (!bypassConverting) {
+            if (!is.null(orgDb)){
+                genesInPathway <- clusterProfiler::bitr(genesInPathway,
+                                                        fromType="SYMBOL",
+                                                        toType=expRow,
+                                                        OrgDb=orgDb)[expRow][,1]
+            }
+        }
+        pathwayMatrix <- exp[ intersect(rownames(exp),
+                                        genesInPathway), expSample ]
         if (dim(pathwayMatrix)[1]==0) {
             message("no gene in the pathway present in expression data")
         } else {
@@ -144,7 +188,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
         }
     }
 
-    if (sizeDep) {names(pathDep) = res$Description}
+    if (sizeDep) {names(pathDep) <- res$Description}
     colnames(pcs) <- pwayNames
 
     pcs <- data.frame(pcs, check.names=FALSE)
@@ -153,7 +197,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
     if (!is.null(otherVar)) {
         pcs <- cbind(pcs, otherVar)
         if (!is.null(otherVarName)){
-          colnames(pcs) <- c(pwayNames, otherVarName)
+            colnames(pcs) <- c(pwayNames, otherVarName)
         }
     }
 
@@ -166,23 +210,31 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
     }
 
     if (strType == "normal"){
-      strength <- boot.strength(pcs, algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl)
+        strength <- withr::with_seed(seed = seed, boot.strength(pcs,
+            algorithm=algo, algorithm.args=algorithm.args, R=R, cluster=cl))
     } else if (strType == "ms"){
-      strength <- inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl)
+        strength <- withr::with_seed(seed = seed,
+            inferMS(pcs, algo=algo, algorithm.args=algorithm.args, R=R, cl=cl))
     }
 
     if (strengthPlot){
-        strengthTop <- strength[order(strength$strength+strength$direction, decreasing = TRUE),][seq_len(nStrength),]
+        strengthTop <- strength[order(strength$strength+strength$direction,
+            decreasing = TRUE),][seq_len(nStrength),]
         strengthTop$label <- paste(strengthTop$from, "to", strengthTop$to)
-        stp <- strengthTop %>% tidyr::pivot_longer(cols=c(strength, direction)) %>%
-            ggplot(aes(x=label, y=value, fill=name))+
+        stp <- strengthTop %>%
+            tidyr::pivot_longer(cols=c(.data$strength, .data$direction)) %>%
+            ggplot(aes(x=.data$label, y=.data$value, fill=.data$name))+
             geom_bar(position="dodge",stat="identity",alpha=0.7)+
             xlab("edges")+
-            coord_flip(y=c(min(strengthTop$strength, strengthTop$direction)-0.05,1.0))+
-            scale_fill_manual(values=c(barPal[1], barPal[2]), na.value="transparent")+
-            scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 25))+
+            coord_flip(ylim=c(min(strengthTop$strength,
+                strengthTop$direction)-0.05,1.0))+
+            scale_fill_manual(values=c(barPal[1], barPal[2]),
+                na.value="transparent")+
+            scale_x_discrete(labels = function(x) stringr::str_wrap(x,
+                                                                width = 25))+
             theme(
-                text=element_text(size=16,  family=fontFamily, color=barTextCol),
+                text=element_text(size=16,  family=fontFamily,
+                    color=barTextCol),
                 plot.background = element_rect(fill = barBackCol, colour = NA),
                 legend.background = ggplot2::element_blank(),
                 legend.key = element_rect(fill = barLegendKeyCol),
@@ -192,7 +244,8 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
                 axis.title.y = element_text(vjust=-0.5),
                 panel.grid.minor = ggplot2::element_blank(),
                 panel.background = element_blank(),
-                panel.grid = ggplot2::element_line(linetype = 3, color = barPanelGridCol, size = 0.2))
+                panel.grid = ggplot2::element_line(linetype = 3,
+                    color = barPanelGridCol, size = 0.2))
     }
 
     if (!is.null(strThresh)){
@@ -201,9 +254,9 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
         av <- averaged.network(strength)
     }
 
-    if (chooseDir){
-        av <- chooseEdgeDir(av, pcs, scoreType)
-    }
+    # if (chooseDir){
+    #     av <- chooseEdgeDir(av, pcs, scoreType)
+    # }
 
     av <- cextend(av, strict=FALSE)
 
@@ -226,7 +279,8 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
 
     ## Make color for glowing edges
     if (!is.null(glowEdgeNum)){
-        highEdge <- E(g)[order(E(g)$label, decreasing=TRUE)][seq_len(glowEdgeNum)]
+        highEdge <- E(g)[order(E(g)$label,
+                                decreasing=TRUE)][seq_len(glowEdgeNum)]
         glowEdge <- E(g) %in% highEdge
         E(g)$glowEdge <- E(g)$color
         E(g)$glowEdge[!glowEdge] <- NA
@@ -240,8 +294,8 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
 
     ## Edge width
     if (is.null(otherVar)) {
-        if (length(results@termsim) != 0) {
-            w <- results@termsim[ names(V(g)), names(V(g)) ]
+        if (length(attributes(results)$termsim) != 0) {
+            w <- attributes(results)$termsim[ names(V(g)), names(V(g)) ]
             wd <- reshape2::melt(w)
             wd <- wd[wd[,1] != wd[,2],]
             wd <- wd[!is.na(wd[,3]),]
@@ -265,19 +319,27 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
 
 
     if (sizeDep) {
-        sizeLab = "-mean dependency"
-        scaleSizePathLow = 1
-        scaleSizePathHigh = 10
-        V(g)$size <- vapply(names(V(g)), function(x) ifelse(x %in% names(pathDep), as.numeric(pathDep[x]), 1), FUN.VALUE=1)
+        sizeLab <- "-mean dependency"
+        scaleSizePathLow <- 1
+        scaleSizePathHigh <- 10
+        V(g)$size <- vapply(names(V(g)),
+            function(x) ifelse(x %in% names(pathDep),
+                as.numeric(pathDep[x]), 1), FUN.VALUE=1)
     } else {
-        sizeLab = "gene count"
-        scaleSizePathLow = 3
-        scaleSizePathHigh = 8
-        V(g)$size <- vapply(names(V(g)), function(x) ifelse(x %in% res$Description, as.numeric(subset(res, Description==x)["Count"]), 3), FUN.VALUE=1)
+        sizeLab <- "gene count"
+        scaleSizePathLow <- 3
+        scaleSizePathHigh <- 8
+        V(g)$size <- vapply(names(V(g)),
+            function(x) ifelse(x %in% res$Description,
+                as.numeric(subset(res, res$Description==x)["Count"]), 3),
+            FUN.VALUE=1)
     }
 
 
-    V(g)$color <- vapply(names(V(g)), function(x) ifelse(x %in% res$Description, as.numeric(subset(res, Description==x)[color]), as.numeric(apply(res[color], 2, mean))), FUN.VALUE=1)
+    V(g)$color <- vapply(names(V(g)),
+        function(x) ifelse(x %in% res$Description,
+            as.numeric(subset(res, res$Description==x)[color]),
+            as.numeric(apply(res[color], 2, mean))), FUN.VALUE=1)
 
 
     if (!is.null(hub)){
@@ -300,32 +362,52 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
 
     ## Plot
         delG <- delete.vertices(g, igraph::degree(g)==0)
-        p <- ggraph(delG, layout=layout) + geom_edge_link(edge_alpha=0.3,
-                                                              position="identity",
-                                                              aes_(edge_colour=~I(color), width=~I(width), label=~I(label)),
-                                                              label_size=3,
-                                                              label_colour=NA,
-                                                              family=fontFamily,
-                                                              angle_calc = "along",
-                                                              label_dodge=unit(3,'mm'),
-                                                              arrow=arrow(length=unit(4, 'mm')),
-                                                              end_cap=circle(5, 'mm'))+
-            geom_node_point(aes_(color=~color, size=~size, shape=~shape),
+        if (edgeLink) {
+            p <- ggraph(delG, layout=layout) + 
+                    geom_edge_link(edge_alpha=0.3,
+                        position="identity",
+                        aes_(edge_colour=~color, width=~width,
+                            label=~label),
+                        label_size=3,
+                        label_colour=NA,
+                        family=fontFamily,
+                        angle_calc = "along",
+                        label_dodge=unit(3,'mm'),
+                        arrow=arrow(length=unit(4, 'mm')),
+                        end_cap=circle(5, 'mm'))
+            } else {
+            p <- ggraph(delG, layout=layout) + 
+                    geom_edge_diagonal(edge_alpha=0.3,
+                        position="identity",
+                        aes_(edge_colour=~color, width=~width,
+                            label=~label),
+                        label_size=3,
+                        label_colour=NA,
+                        family=fontFamily,
+                        angle_calc = "along",
+                        label_dodge=unit(3,'mm'),
+                        arrow=arrow(length=unit(4, 'mm')),
+                        end_cap=circle(5, 'mm'))                
+            }
+            p <- p + geom_node_point(aes_(color=~color,
+                size=~size, shape=~shape),
                             show.legend=TRUE, alpha=0.4)+
-            scale_color_continuous(low=nodePal[1], high=nodePal[2], name=color,
-                                   na.value="transparent") +
-            scale_size(range=c(scaleSizePathLow, scaleSizePathHigh) * cexCategory, name=sizeLab)+
+            scale_color_continuous(low=nodePal[1], high=nodePal[2],
+                name=color,
+                                    na.value="transparent") +
+            scale_size(range=c(scaleSizePathLow,
+                scaleSizePathHigh) * cexCategory, name=sizeLab)+
             scale_edge_width(range=c(1, 3), guide="none")+
-            scale_edge_color_continuous(low=edgePal[1], high=edgePal[2], name="strength",
+            scale_edge_color_continuous(low=edgePal[1], high=edgePal[2],
+                                        name="strength",
                                         na.value="transparent")+
             guides(edge_color = guide_edge_colorbar(title.vjust = 3))+
-            geom_node_text(aes_(label=~stringr::str_wrap(name, width = 25), color=~color), check_overlap=TRUE, nudge_y=0.2, repel=TRUE, fontface="bold",
-                           family=fontFamily, size = labelSize) +
             scale_shape_identity()+
             theme_graph() +
             theme(
                 text=element_text(size=16,  family=fontFamily, color=textCol),
-                # plot.title = element_text(size=24, family=fontFamily, color = titleCol),
+                # plot.title = element_text(size=24,
+                # family=fontFamily, color = titleCol),
                 panel.background = element_blank(),
                 plot.background = element_rect(fill = backCol, colour = NA))
 
@@ -350,17 +432,34 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc", R=20, exp
 
     if (!is.null(glowEdgeNum)){
         for (i in seq_len(layers+1)){
-            p <- p + geom_edge_link(
-                    position="identity",
-                    aes_(edge_colour=~I(glowEdge),
-                         edge_alpha=~I(alphaEdge)),
-                    width=edgeSize+(glow_edge_size*i),
-                    arrow=arrow(length=unit(i*0.1, 'mm')),
-                    end_cap=circle(5, 'mm')
-                )
+            if (edgeLink) {
+                p <- p + geom_edge_link(
+                        position="identity",
+                        aes_(edge_colour=~glowEdge,
+                            edge_alpha=~alphaEdge),
+                        width=edgeSize+(glow_edge_size*i),
+                        arrow=arrow(length=unit(i*0.1, 'mm')),
+                        end_cap=circle(5, 'mm')
+                    )
+            } else {
+                p <- p + geom_edge_diagonal(
+                        position="identity",
+                        aes_(edge_colour=~glowEdge,
+                            edge_alpha=~alphaEdge),
+                        width=edgeSize+(glow_edge_size*i),
+                        arrow=arrow(length=unit(i*0.1, 'mm')),
+                        end_cap=circle(5, 'mm')
+                    )                
+            }
         }
     }
-
+    bg.colour <- ifelse(is.null(bg.colour), "transparent", bg.colour)
+    p <-  p + geom_node_text(aes_(label=~stringr::str_wrap(name, width = 25),
+                        color=~color), check_overlap=TRUE,
+                        nudge_y=0.2, repel=TRUE, fontface="bold",
+                        family=fontFamily, size = labelSize,
+                        bg.colour=bg.colour,
+                        bg.r = bg.r)
     p <- p+scale_alpha(range = c(0.01, 0.1), guide="none")+
         scale_edge_alpha(range=c(0.01, 0.1),guide="none")
 

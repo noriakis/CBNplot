@@ -11,7 +11,8 @@ inferMS(data, algo, algorithm.args, R, cl = NULL, r = seq(0.5, 1.5, 0.1))
 
 \item{algo}{structure learning method used in boot.strength()}
 
-\item{algorithm.args}{parameters to pass to bnlearn structure learnng function}
+\item{algorithm.args}{parameters to pass to
+bnlearn structure learnng function}
 
 \item{R}{the number of bootstrap}
 
