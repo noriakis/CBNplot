@@ -9,3 +9,6 @@ Changes in version 0.99.3 (2023-04-07)
 
 Changes in version 0.99.4 (2023-04-07)
 + Fixed the WARNINGS in package builder at bioconductor.org
+
+Changes in version 0.99.5 (2023-04-13)
++ Changed the dependency for R version
