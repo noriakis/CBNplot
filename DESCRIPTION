@@ -1,7 +1,7 @@
 Package: CBNplot
 Type: Package
 Title: plot bayesian network inferred from gene expression data based on enrichment analysis results
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: person("Noriaki", "Sato", email = "nori@hgc.jp", role = c("cre", "aut"))
 Description: This package provides the visualization of bayesian network inferred from gene expression data. The networks are based on enrichment analysis results inferred from packages including clusterProfiler and ReactomePA. The networks between pathways and genes inside the pathways can be inferred and visualized.
 License: Artistic-2.0
