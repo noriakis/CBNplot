@@ -3,3 +3,12 @@ Changes in version 0.99.0 (2021-07-29)
 
 Changes in version 0.99.1 (2022-02-24)
 + Fixed errors and warnings raised in pre-checking
+
+Changes in version 0.99.3 (2023-04-07)
++ Fixed the problems raised in the review
+
+Changes in version 0.99.4 (2023-04-07)
++ Fixed the WARNINGS in package builder at bioconductor.org
+
+Changes in version 0.99.5 (2023-04-13)
++ Changed the dependency for R version

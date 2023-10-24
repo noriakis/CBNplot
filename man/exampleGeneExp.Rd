@@ -10,6 +10,9 @@ An object of class \code{data.frame} with 7 rows and 100 columns.
 \usage{
 data(exampleGeneExp)
 }
+\value{
+example gene expression
+}
 \description{
 An example gene expression data to be used for testing purpose
 made by runif() for ERCC genes and 100 samples.
