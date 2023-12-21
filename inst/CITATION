@@ -1,0 +1,19 @@
+citEntry(entry  ="ARTICLE",
+         title  = "CBNplot: Bayesian network plots for enrichment analysis",
+         author = personList(
+             as.person("Noriaki Sato"),
+             as.person("Yoshinori Tamada"),
+             as.person("Guangchuang Yu"),
+             as.person("Yasushi Okuno")
+             ),
+         journal = "Bioinformatics",
+         year    = "2022",
+         volume  = "38",
+         number  = "10",
+         pages   = "2959-2960",
+         PMID    = "35561164",
+         doi     = "10.1093/bioinformatics/btac175",
+         textVersion = paste("Sato N, Tamada Y, Yu G, Okuno Y.",
+                             "CBNplot: Bayesian network plots for enrichment analysis.", 
+                             "Bioinformatics. 2022 May 13;38(10):2959-2960.")
+         )
