@@ -301,7 +301,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
 
     # print(dim(pcs))
     if (dim(pcs)[2]<=1){
-        message("the number of gene is zero or one");return("error")}
+        stop("the number of gene is zero or one");}
 
     ## Bootstrap-based inference
     if (!useSiGN){
@@ -367,7 +367,7 @@ bngeneplot <- function (results, exp, expSample=NULL, algo="hc", R=20,
 
         g <- bnlearn::as.igraph(av)
         e <- as_edgelist(g, names = TRUE)
-        if (dim(e)[1]==0){message("no edge present in graph");return("error")}
+        if (dim(e)[1]==0){stop("no edge present in graph");}
         eName <-paste0(e[,1], "_", e[,2])
         colnames(e) <- c("from","to")
         eDf <- merge(e, strength)

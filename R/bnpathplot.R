@@ -288,7 +288,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
     if (sizeDep) {names(pathDep) <- res$Description}
     colnames(pcs) <- pwayNames
     pcs <- data.frame(pcs, check.names=FALSE)
-    if (dim(pcs)[1]==0){return("error")}
+    if (dim(pcs)[1]<=1){stop("Zero or one pathway in the resulting matrix.")}
 
 
     if (!is.null(otherVar)) {
@@ -348,7 +348,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
                                                                 width = 25))
     }
 
-    if (dim(strength)[1]==0) {return("error")}
+    if (dim(strength)[1]==0) {stop("Strength data.frame is empty.")}
     ## Average by specified threshold
     if (!useSiGN) {
         if (!is.null(strThresh)){
@@ -372,7 +372,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
 
         g <- bnlearn::as.igraph(av)
         e <- as_edgelist(g, names = TRUE)
-        if (dim(e)[1]==0){message("no edge present in graph");return("error")}
+        if (dim(e)[1]==0){stop("no edge present in graph");}
         eName <-paste0(e[,1], "_", e[,2])
         colnames(e) <- c("from","to")
         eDf <- merge(e, strength)

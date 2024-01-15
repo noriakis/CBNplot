@@ -192,7 +192,7 @@ bnpathplotCustom <- function (results, exp, expSample=NULL, algo="hc",
     colnames(pcs) <- pwayNames
 
     pcs <- data.frame(pcs, check.names=FALSE)
-    if (dim(pcs)[1]==0){return("error")}
+    if (dim(pcs)[1]<=1){stop("Zero or one pathway present in the resulting matrix.")}
     
     if (!is.null(otherVar)) {
         pcs <- cbind(pcs, otherVar)
