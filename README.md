@@ -19,7 +19,8 @@ install_github("noriakis/CBNplot")
 
 ### Usage
 - Documentation: [https://noriakis.github.io/software/CBNplot/](https://noriakis.github.io/software/CBNplot/)
-- Web server: [https://cbnplot.com](https://cbnplot.com)
+- Web server: ~~[https://cbnplot.com](https://cbnplot.com)~~
+  - Currently moving to the new server (2024/04/07)
 
 ### Plot examples
 
