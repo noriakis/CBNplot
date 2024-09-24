@@ -86,7 +86,7 @@
 bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
                     algorithm.args=NULL, expRow="ENSEMBL", cl=NULL,
                     returnNet=FALSE, otherVar=NULL, otherVarName=NULL,
-                    qvalueCutOff=0.05, adjpCutOff=0.05, nCategory=15,
+                    qvalueCutOff=NULL, adjpCutOff=0.05, nCategory=15,
                     R=20, interactive=FALSE, color="p.adjust", cexCategory=1,
                     cexLine=0.5, chooseDir=FALSE, showDir=FALSE,
                     delZeroDegree=TRUE, labelSize=4, layout="nicely",
@@ -237,7 +237,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
                 res <- res[!is.na(res$ID),]
             }
     }
-
+    
     ## Some pathway databases have duplicate names
     if (sum(duplicated(res$Description))>0){
         dnames <- res$Description[duplicated(res$Description)]
@@ -254,6 +254,7 @@ bnpathplot <- function (results, exp, expSample=NULL, algo="hc",
     pcs <- c()
     pwayNames <- c()
     pathDep <- c()
+    
     for (i in seq_len(length(rownames(res)))) {
         genesInPathway <- strsplit(res[i, ]$geneID, "/")[[1]]
 

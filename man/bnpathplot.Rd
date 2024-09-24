@@ -15,7 +15,7 @@ bnpathplot(
   returnNet = FALSE,
   otherVar = NULL,
   otherVarName = NULL,
-  qvalueCutOff = 0.05,
+  qvalueCutOff = NULL,
   adjpCutOff = 0.05,
   nCategory = 15,
   R = 20,

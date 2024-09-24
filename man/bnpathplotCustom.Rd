@@ -23,7 +23,7 @@ bnpathplotCustom(
   disc = FALSE,
   tr = NULL,
   remainCont = NULL,
-  qvalueCutOff = 0.05,
+  qvalueCutOff = NULL,
   adjpCutOff = 0.05,
   nCategory = 15,
   cexLine = 1,
