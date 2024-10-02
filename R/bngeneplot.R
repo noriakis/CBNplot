@@ -79,7 +79,6 @@
 #' res <- bngeneplot(results = exampleEaRes, exp = exampleGeneExp, pathNum = 1,
 #'                   R = 10, convertSymbol = TRUE, expRow = "ENSEMBL")
 #'
-#' @import oaqc
 #' @importFrom dplyr group_by summarize arrange n
 #' @importFrom utils write.table
 #' @importFrom graphite pathways convertIdentifiers pathwayGraph

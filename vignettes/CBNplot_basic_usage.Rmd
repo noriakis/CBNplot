@@ -43,8 +43,8 @@ counts <- head(gaussian.test, length(genes))
 row.names(counts) <- genes
 
 ## Perform enrichment analysis
-pway <- ReactomePA::enrichPathway(gene = genes)
-pway <- clusterProfiler::setReadable(pway, org.Hs.eg.db)
+pway <- clusterProfiler::enrichKEGG(gene = genes)
+pway <- clusterProfiler::setReadable(pway, org.Hs.eg.db, keyType="ENTREZID")
 ```
 
 
@@ -87,9 +87,9 @@ bnpathplot(results = pway,exp = counts, nCategory=5, shadowText = TRUE, expRow="
 
 ```{r usecase4, include=TRUE, echo=TRUE, message=FALSE, cache=FALSE, warning=FALSE, comment=FALSE, fig.height = 10, fig.width = 10}
 bnpathplotCustom(results = pway, exp = counts, expRow="ENTREZID",
-  fontFamily="serif", glowEdgeNum=3, hub=3)
+                 fontFamily="serif", glowEdgeNum=1, hub=1)
 bngeneplotCustom(results = pway, exp = counts, expRow="ENTREZID",
-  pathNum=2, fontFamily="sans", glowEdgeNum=NULL, hub=3)
+                 pathNum=1, fontFamily="sans", glowEdgeNum=NULL, hub=1)
 ```
 
 The detailed usage for the package, like including covariates to the plot and probabilistic reasoning is available in the package documentation ([https://noriakis.github.io/CBNplot/](https://noriakis.github.io/CBNplot/)).
